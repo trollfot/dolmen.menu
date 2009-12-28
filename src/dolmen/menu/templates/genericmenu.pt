@@ -1,0 +1,20 @@
+<dl tal:condition="viewletmanager/actions"
+    tal:attributes="id viewletmanager/__name__;
+		class viewletmanager/menu_class;">
+  <dt tal:content="viewletmanager/title"
+      tal:condition="viewletmanager/title" />
+  <dd>
+    <ul class="menu">
+      <tal:actions repeat="action viewletmanager/actions">
+	<li tal:attributes="class action/css">
+	  <a tal:condition="not: action/selected"
+	      tal:attributes="href action/url; title action/title;"
+	      tal:content="action/title" />
+	  <a tal:condition="action/selected"
+	      tal:attributes="title action/title;"
+	      tal:content="action/title" />
+	</li>
+      </tal:actions>
+    </ul>
+  </dd>
+</dl>
