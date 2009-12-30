@@ -60,7 +60,7 @@ class Menu(viewlet.ViewletManager):
         viewlets = self.sort(viewlets)
 
         # Just use the viewlets from now on
-        self.viewlets=[]
+        self.viewlets = []
         for name, viewlet in viewlets:
             if ILocation.providedBy(viewlet):
                 viewlet.__name__ = name
