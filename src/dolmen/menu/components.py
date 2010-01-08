@@ -4,11 +4,12 @@ import grokcore.view
 from grokcore.component import baseclass
 from grokcore import view, viewlet
 from zope.location.interfaces import ILocation
-from dolmen.menu.interfaces import IMenu, IMenuEntry
+from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 from zope.traversing.browser.absoluteurl import absoluteURL
 from zope.interface import implements
 from zope.component import getAdapters
 from zope.schema.fieldproperty import FieldProperty
+from zope.viewlet.interfaces import IViewlet
 
 
 class Menu(viewlet.ViewletManager):
@@ -22,35 +23,26 @@ class Menu(viewlet.ViewletManager):
     entries = FieldProperty(IMenu['entries'])
     menu_class = FieldProperty(IMenu['menu_class'])
     entry_class = FieldProperty(IMenu['entry_class'])
+    context_url = FieldProperty(IMenu['context_url'])
 
     def filter(self, viewlets):
         pass
     
     def _get_entries(self, actions):
-        if not actions:
-            return []
-
-        url = absoluteURL(self.context, self.request)
-        selected = getattr(self.view, '__name__', None)
-        entries = []
-
-        for action in actions:
-            name = action.__name__
-            title = view.title.bind().get(action) or name
-            is_selected = name == selected
-            entries.append({
-                    'url': "%s/%s" % (url, name),
-                    'title': title,
-                    'selected': is_selected,
-                    'css': (is_selected and
-                            self.entry_class + ' selected' or
-                            self.entry_class)})
-        return entries
+        if actions:
+            selected = getattr(self.view, '__name__', None)
+            for action in actions:
+                is_selected = action['id'] == selected
+                action['selected'] = action['id'] == selected
+                action['css'] = (action['selected'] and
+                                 self.entry_class + ' selected' or
+                                 self.entry_class)
+        return actions
 
     def update(self):
         self.__updated = True
         self.title = view.title.bind().get(self) or self.__name__
-
+        self.context_url = absoluteURL(self.context, self.request)
         # Find all content providers for the region
         viewlets = getAdapters(
             (self.context, self.request, self.__parent__, self),
@@ -63,29 +55,36 @@ class Menu(viewlet.ViewletManager):
         for name, viewlet in viewlets:
             if ILocation.providedBy(viewlet):
                 viewlet.__name__ = name
-            self.viewlets.append(viewlet)
+            viewlet.update()
+            self.viewlets.append(viewlet.render())
 
         self._updateViewlets()
         self.entries = self._get_entries(self.viewlets)
 
+
+class ViewletEntry(object):
+    """Viewlet
+    """
+    implements(IMenuEntryViewlet)
+
+    description = FieldProperty(IMenuEntryViewlet['description'])
+    manager = FieldProperty(IMenuEntryViewlet['manager'])
+    __name__ = FieldProperty(IMenuEntryViewlet['__name__'])
+    permission = FieldProperty(IMenuEntryViewlet['permission'])
+    url = FieldProperty(IMenuEntryViewlet['url'])
+
+    def __init__(self, context, request, view, manager):
+        self.view = self.__parent__ = view
+        self.context = context
+        self.request = request
+        self.manager = manager
+
+    def update(self):
+        self.url = "%s/%s" % (self.manager.context_url, self.__name__)
+
     def render(self):
-        return self.template.render(self)
-
-
-class MenuEntryFactory(object):
-    """A menu entry factory
-    """
-    baseclass()
-    _dict = {}
-
-    @classmethod
-    def generate_entry(cls, view, manager, context, name, title, require):
-        return type('%s_entry' % name, (viewlet.Viewlet, ),
-                     {'name': name, 'title': title, 'require': require})
-        
-
-
-class MenuEntry(viewlet.Viewlet):
-    """
-    """
-    baseclass()
+        return dict(
+            id=self.__name__,
+            url=self.url,
+            title=self.title,
+            description=self.description)

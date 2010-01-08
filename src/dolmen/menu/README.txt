@@ -4,7 +4,8 @@ dolmen.menu
 
   >>> from zope.location.location import Location
   >>> from grokcore import view
-  >>> from dolmen.menu import menu, Menu, MenuEntry
+  >>> from grokcore import component
+  >>> from dolmen.menu import menu, Menu
   >>> from zope.interface import Interface
   >>> from zope.publisher.browser import TestRequest
   >>> from zope.component import getMultiAdapter
@@ -31,11 +32,11 @@ dolmen.menu
   <dolmen.menu.tests.SomeView object at ...>
 
   >>> mymenu = MyMenu(context, request, someview)
-  
+
   >>> class TestEntry(view.View):
   ...   view.context(Interface)
   ...   menu(MyMenu)
-
+ 
   >>> grok_component('test', TestEntry)
   True
 
