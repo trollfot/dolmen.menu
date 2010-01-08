@@ -47,6 +47,7 @@ class MenuEntryGrokker(martian.ClassGrokker):
         entry.__view_name__ = entry_name
         entry.module_info = factory.module_info
 
+        # We enqueue our component in the registry config.
         config.action(
             discriminator = ('viewlet', context, layer,
                              view, menu, entry_name),

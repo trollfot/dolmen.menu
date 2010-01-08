@@ -10,6 +10,7 @@ from zope.interface import implements
 from zope.component import getAdapters
 from zope.schema.fieldproperty import FieldProperty
 from zope.viewlet.interfaces import IViewlet
+from zope.security import checkPermission
 
 
 class Menu(viewlet.ViewletManager):
@@ -26,19 +27,12 @@ class Menu(viewlet.ViewletManager):
     context_url = FieldProperty(IMenu['context_url'])
 
     def filter(self, viewlets):
-        pass
-    
-    def _get_entries(self, actions):
-        if actions:
-            selected = getattr(self.view, '__name__', None)
-            for action in actions:
-                is_selected = action['id'] == selected
-                action['selected'] = action['id'] == selected
-                action['css'] = (action['selected'] and
-                                 self.entry_class + ' selected' or
-                                 self.entry_class)
-        return actions
+        return [(name, viewlet) for name, viewlet in viewlets
+                if checkPermission(viewlet.permission, self.context)]
 
+    def get_entries(self, viewlets):
+        return [viewlet.render() for viewlet in viewlets]
+    
     def update(self):
         self.__updated = True
         self.title = view.title.bind().get(self) or self.__name__
@@ -48,6 +42,7 @@ class Menu(viewlet.ViewletManager):
             (self.context, self.request, self.__parent__, self),
             IMenuEntry)
 
+        viewlets = self.filter(viewlets)
         viewlets = self.sort(viewlets)
 
         # Just use the viewlets from now on
@@ -55,11 +50,10 @@ class Menu(viewlet.ViewletManager):
         for name, viewlet in viewlets:
             if ILocation.providedBy(viewlet):
                 viewlet.__name__ = name
-            viewlet.update()
-            self.viewlets.append(viewlet.render())
+            self.viewlets.append(viewlet)
 
         self._updateViewlets()
-        self.entries = self._get_entries(self.viewlets)
+        self.entries = self.get_entries(self.viewlets)
 
 
 class ViewletEntry(object):
@@ -87,4 +81,5 @@ class ViewletEntry(object):
             id=self.__name__,
             url=self.url,
             title=self.title,
-            description=self.description)
+            description=self.description,
+            selected = self.__name__ == self.view.__name__)
