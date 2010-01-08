@@ -5,36 +5,40 @@ from grokcore import component, view, viewlet
 from grokcore.view.meta.views import default_view_name
 from zope import component, interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
-from dolmen.menu import menu, IMenuEntry
+import dolmen.menu
 
 
-def altered_init(self, context, request, view=None, viewletmanager=None):
-    self.view = view
-    self.viewletmanager = viewletmanager
-    return self.__view_init__(context, request)
+def generate_entry(name):
+    return type(name, (viewlet.Viewlet, ), {})
 
 
-class MenuItemGrokker(martian.ClassGrokker):
+from sys import modules
+from grokcore.component import zcml
+from zope.interface import directlyProvides
+
+
+class MenuEntryGrokker(martian.ClassGrokker):
     martian.component(view.View)
     martian.directive(view.context)
     martian.directive(viewlet.view, default=interface.Interface)
     martian.directive(viewlet.layer, default=IDefaultBrowserLayer)
     martian.directive(viewlet.name, get_default=default_view_name)
-    martian.directive(menu, default=None)
+    martian.directive(dolmen.menu.menu, default=None)
 
     def execute(self, factory, config, context, view, layer, name, menu, **kw):
 
-        if menu is None:
-            return True
-
-        factory.__view_init__ = factory.__init__
-        factory.__init__ = altered_init
+        entry_name = factory.__name__.lower() + '_menu_entry'
+        entry = generate_entry(entry_name)
+        entry.__view_name__ = entry_name
 
         config.action(
             discriminator = ('viewlet', context, layer,
-                             view, menu, name),
+                             view, menu, entry_name),
             callable = component.provideAdapter,
-            args = (factory, (context, layer, view, menu),
-                    IMenuEntry, name)
+            args = (entry, (context, layer, view, menu),
+                    dolmen.menu.IMenuEntry, entry_name)
             )
+        
         return True
+
+

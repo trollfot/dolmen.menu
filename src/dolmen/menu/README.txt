@@ -43,7 +43,7 @@ dolmen.menu
   >>> mymenu.viewlets
   [<dolmen.menu.tests.TestEntry object at ...>]
 
-  >>> mymenu.actions
+  >>> mymenu.entries
   [{'url': u'http://127.0.0.1/test/testentry',
     'selected': False, 'css': u'entry', 'title': u'testentry'}]
 
@@ -63,7 +63,7 @@ dolmen.menu
   >>> selected = TestEntry(context, request)
   >>> mymenu = MyMenu(context, request, selected)
   >>> mymenu.update()
-  >>> mymenu.actions
+  >>> mymenu.entries
   [{'url': u'http://127.0.0.1/test/testentry',
     'selected': True, 'css': u'entry selected', 'title': u'testentry'}]
 
@@ -71,6 +71,6 @@ dolmen.menu
   >>> from grokcore.view import title
   >>> title.set(TestEntry, u'A Simple Title')
   >>> mymenu.update()
-  >>> mymenu.actions
+  >>> mymenu.entries
   [{'url': u'http://127.0.0.1/test/testentry',
     'selected': True, 'css': u'entry selected', 'title': u'A Simple Title'}]

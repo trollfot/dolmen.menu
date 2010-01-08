@@ -8,6 +8,7 @@ from dolmen.menu.interfaces import IMenu, IMenuEntry
 from zope.traversing.browser.absoluteurl import absoluteURL
 from zope.interface import implements
 from zope.component import getAdapters
+from zope.schema.fieldproperty import FieldProperty
 
 
 class Menu(viewlet.ViewletManager):
@@ -18,13 +19,12 @@ class Menu(viewlet.ViewletManager):
 
     template = grokcore.view.PageTemplateFile("templates/genericmenu.pt")
 
-    actions = None
-    menu_class = u"menu"
-    entry_class = u"entry"
+    entries = FieldProperty(IMenu['entries'])
+    menu_class = FieldProperty(IMenu['menu_class'])
+    entry_class = FieldProperty(IMenu['entry_class'])
 
     def filter(self, viewlets):
         pass
-
     
     def _get_entries(self, actions):
         if not actions:
@@ -47,7 +47,6 @@ class Menu(viewlet.ViewletManager):
                             self.entry_class)})
         return entries
 
-
     def update(self):
         self.__updated = True
         self.title = view.title.bind().get(self) or self.__name__
@@ -67,10 +66,23 @@ class Menu(viewlet.ViewletManager):
             self.viewlets.append(viewlet)
 
         self._updateViewlets()
-        self.actions = self._get_entries(self.viewlets)
+        self.entries = self._get_entries(self.viewlets)
 
     def render(self):
         return self.template.render(self)
+
+
+class MenuEntryFactory(object):
+    """A menu entry factory
+    """
+    baseclass()
+    _dict = {}
+
+    @classmethod
+    def generate_entry(cls, view, manager, context, name, title, require):
+        return type('%s_entry' % name, (viewlet.Viewlet, ),
+                     {'name': name, 'title': title, 'require': require})
+        
 
 
 class MenuEntry(viewlet.Viewlet):
