@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
 import grokcore.view
+import grokcore.viewlet
+
 from grokcore.component import baseclass
-from grokcore import view, viewlet
+
 from zope.location.interfaces import ILocation
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 from zope.traversing.browser.absoluteurl import absoluteURL
-from zope.interface import implements
+from zope.interface import implements, Interface
 from zope.component import getAdapters
 from zope.schema.fieldproperty import FieldProperty
 from zope.viewlet.interfaces import IViewlet
 from zope.security import checkPermission
 
 
-class Menu(viewlet.ViewletManager):
+class Menu(grokcore.viewlet.ViewletManager):
     """
     """
     baseclass()
@@ -35,7 +37,7 @@ class Menu(viewlet.ViewletManager):
     
     def update(self):
         self.__updated = True
-        self.title = view.title.bind().get(self) or self.__name__
+        self.title = grokcore.view.title.bind().get(self) or self.__name__
         self.context_url = absoluteURL(self.context, self.request)
         # Find all content providers for the region
         viewlets = getAdapters(
@@ -56,14 +58,14 @@ class Menu(viewlet.ViewletManager):
         self.entries = self.get_entries(self.viewlets)
 
 
-class ViewletEntry(object):
+class BoundEntry(object):
     """Viewlet
     """
     implements(IMenuEntryViewlet)
 
+    __name__ = FieldProperty(IMenuEntryViewlet['__name__'])
     description = FieldProperty(IMenuEntryViewlet['description'])
     manager = FieldProperty(IMenuEntryViewlet['manager'])
-    __name__ = FieldProperty(IMenuEntryViewlet['__name__'])
     permission = FieldProperty(IMenuEntryViewlet['permission'])
     url = FieldProperty(IMenuEntryViewlet['url'])
 
@@ -73,13 +75,31 @@ class ViewletEntry(object):
         self.request = request
         self.manager = manager
 
+    def __repr__(self):
+        return  "<BoundEntry `%s` for menu `%s`>" % (
+            self.__name__, self.manager.__name__)
+
     def update(self):
-        self.url = "%s/%s" % (self.manager.context_url, self.__name__)
+        self.url = str("%s/%s" % (self.manager.context_url, self.__name__))
 
     def render(self):
         return dict(
             id=self.__name__,
             url=self.url,
             title=self.title,
-            description=self.description,
+            description=self.description or self.title or None,
             selected = self.__name__ == self.view.__name__)
+
+
+class Entry(BoundEntry):
+    """A manually registered entry.
+    """
+    baseclass()
+    grokcore.viewlet.context(Interface)
+
+    def update(self):
+        pass
+
+    def __repr__(self):
+        return  "<Entry `%s` for menu `%s`>" % (
+            self.__view_name__, self.manager.__name__)

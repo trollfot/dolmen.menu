@@ -12,13 +12,26 @@
       component="zope.securitypolicy.zopepolicy.ZopeSecurityPolicy"
       />
 
+ <unauthenticatedPrincipal
+     id="zope.anybody"
+     title="Unauthenticated User" />
+
   <principal
-      id="zope.mgr"
-      title="Manager"
-      login="mgr"
-      password="mgrpw"
+      id="zope.user"
+      title="Some user"
+      login="user"
+      password="userpw"
       />
 
   <grantAll principal="zope.mgr" />
+
+  <grant permission="zope.View"
+	 principal="zope.anybody" />
+
+  <grant permission="zope.View"
+	 principal="zope.user" />
+
+  <grant permission="zope.ManageContent"
+	 principal="zope.user" />
 
 </configure>

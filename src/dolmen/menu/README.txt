@@ -3,9 +3,8 @@ dolmen.menu
 ===========
 
   >>> from zope.location.location import Location
-  >>> from grokcore import view
-  >>> from grokcore import component
-  >>> from dolmen.menu import menu, Menu
+  >>> from grokcore import component, viewlet, view, security
+  >>> from dolmen.menu import menu, Menu, Entry
   >>> from zope.interface import Interface
   >>> from zope.publisher.browser import TestRequest
   >>> from zope.component import getMultiAdapter
@@ -40,13 +39,18 @@ dolmen.menu
   >>> grok_component('test', TestEntry)
   True
 
+  >>> from zope.security.testing import Principal, Participation
+  >>> from zope.security.management import newInteraction, endInteraction
+
+  >>> participation = Participation(Principal('zope.anybody'))
+  >>> newInteraction(participation)
+
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<dolmen.menu.tests.TestEntry object at ...>]
+  [<BoundEntry `testentry` for menu `mymenu`>]
 
   >>> mymenu.entries
-  [{'url': u'http://127.0.0.1/test/testentry',
-    'selected': False, 'css': u'entry', 'title': u'testentry'}]
+  [{'url': 'http://127.0.0.1/test/testentry', 'title': 'testentry', 'selected': False, 'id': 'testentry', 'description': 'testentry'}]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -65,13 +69,68 @@ dolmen.menu
   >>> mymenu = MyMenu(context, request, selected)
   >>> mymenu.update()
   >>> mymenu.entries
-  [{'url': u'http://127.0.0.1/test/testentry',
-    'selected': True, 'css': u'entry selected', 'title': u'testentry'}]
+  [{...'selected': True...}]
 
+  >>> class ProtectedEntry(view.View):
+  ...   view.context(Interface)	
+  ...	view.require('zope.ManageContent')
+  ...   menu(MyMenu)
+ 
+  >>> grok_component('prot', ProtectedEntry)
+  True
 
-  >>> from grokcore.view import title
-  >>> title.set(TestEntry, u'A Simple Title')
+Anonymous rights doesn't grant us the access to the viewlet::
+
   >>> mymenu.update()
-  >>> mymenu.entries
-  [{'url': u'http://127.0.0.1/test/testentry',
-    'selected': True, 'css': u'entry selected', 'title': u'A Simple Title'}]
+  >>> mymenu.viewlets
+  [<BoundEntry `testentry` for menu `mymenu`>]
+
+  
+Using a user with the appropriate rights, we now have both the items::
+
+  >>> endInteraction()
+  >>> participation = Participation(Principal('zope.user'))
+  >>> newInteraction(participation)
+
+  >>> mymenu.update()
+  >>> mymenu.viewlets
+  [<BoundEntry `protectedentry` for menu `mymenu`>,
+   <BoundEntry `testentry` for menu `mymenu`>]
+
+Security also works with grok Permissions::
+
+  >>> class MyPerm(security.Permission):
+  ...   security.name('menu.Display')
+
+  >>> grok_component('perm', MyPerm)
+  True
+
+  >>> class OtherProtectedEntry(view.View):
+  ...   view.context(Interface)	
+  ...	view.require(MyPerm)
+  ...   menu(MyMenu)
+
+  >>> grok_component('ope', OtherProtectedEntry)
+  True
+
+
+Manual registration
+===================
+
+  >>> class SomeEntry(Entry):
+  ...   menu(MyMenu)
+  ...
+  ...   title = u"Grok website"
+  ...   url = "http://grok.zope.org"
+  ...   description = u"The homepage of the Grok project"
+
+  >>> grok_component('entry', SomeEntry)
+  True
+
+  >>> mymenu.update()
+  >>> mymenu.viewlets
+  [<BoundEntry `protectedentry` for menu `mymenu`>,
+   <BoundEntry `testentry` for menu `mymenu`>,
+   <Entry `someentry` for menu `mymenu`>]
+
+  >>> endInteraction()
