@@ -14,7 +14,7 @@ install_requires = [
     'grokcore.viewlet',
     'grokcore.view',
     'martian',
-    'zope.interface'
+    'zope.interface',
     'zope.security'
     ]
 
