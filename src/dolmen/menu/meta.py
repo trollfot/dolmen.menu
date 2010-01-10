@@ -83,34 +83,6 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
                 raise ValueError, "Invalid menu type"
 
         factory.__view_name__ = name
-
-        
-
-class ViewletMenuEntriesGrokker(martian.ClassGrokker):
-    martian.component(dolmen.menu.Entry)
-
-    martian.directive(viewlet.context)
-    martian.directive(viewlet.view, default=interface.Interface)
-    martian.directive(viewlet.layer, default=IDefaultBrowserLayer)
-    martian.directive(viewlet.name, get_default=default_view_name)
-    martian.directive(dolmen.menu.menu, default=None)
-    
-    def execute(self, factory, config, context, menu, view, layer, name, **kw):
-
-        if not context:
-            raise ValueError, "No Context"
-
-        if not menu:
-            raise ValueError, "No menu"
-
-        if interface.interfaces.IInterface.providedBy(menu):
-            if not menu.isOrExtends(dolmen.menu.IMenu):
-                raise ValueError, "Invalid menu type"
-        else:
-            if not dolmen.menu.IMenu.implementedBy(menu):
-                raise ValueError, "Invalid menu type"
-
-        factory.__view_name__ = name
         interface.verify.verifyClass(dolmen.menu.IMenuEntry, factory)
 
         # We enqueue our component in the registry config.
