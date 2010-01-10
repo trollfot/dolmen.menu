@@ -50,7 +50,7 @@ class ViewMenuEntriesGrokker(martian.ClassGrokker):
         # We enqueue our component in the registry config.
         config.action(
             discriminator=(
-                'viewlet', context, layer, view, menu, entry_name),
+                'menu-entry', context, layer, view, menu, entry_name),
             callable=component.provideAdapter,
             args=(entry, (context, layer, view, menu),
                     dolmen.menu.IMenuEntry, entry_name))
@@ -87,7 +87,7 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
 
         # We enqueue our component in the registry config.
         config.action(
-            discriminator = ('viewlet', context, layer,
+            discriminator = ('menu-entry', context, layer,
                              view, menu, name),
             callable = component.provideAdapter,
             args = (factory, (context, layer, view, menu),
