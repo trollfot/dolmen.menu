@@ -3,16 +3,14 @@
 import grokcore.view
 import grokcore.viewlet
 
-from grokcore.component import baseclass
-
-from zope.location.interfaces import ILocation
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
-from zope.traversing.browser.absoluteurl import absoluteURL
-from zope.interface import implements, Interface
+from grokcore.component import baseclass
 from zope.component import getAdapters
+from zope.interface import implements, Interface
+from zope.location.interfaces import ILocation
 from zope.schema.fieldproperty import FieldProperty
-from zope.viewlet.interfaces import IViewlet
 from zope.security import checkPermission
+from zope.traversing.browser.absoluteurl import absoluteURL
 
 
 class Menu(grokcore.viewlet.ViewletManager):
@@ -23,17 +21,34 @@ class Menu(grokcore.viewlet.ViewletManager):
 
     template = grokcore.view.PageTemplateFile("templates/genericmenu.pt")
 
+    viewlets = []
     entries = FieldProperty(IMenu['entries'])
     menu_class = FieldProperty(IMenu['menu_class'])
     entry_class = FieldProperty(IMenu['entry_class'])
     context_url = FieldProperty(IMenu['context_url'])
 
+    def _updateViewlets(self):
+        """Doesn't fire events, like the original ViewletManager, on purpose.
+        """
+        for viewlet in self.viewlets:
+            if IMenuEntryViewlet.providedBy(viewlet):
+                viewlet.update()
+
     def filter(self, viewlets):
         return [(name, viewlet) for name, viewlet in viewlets
                 if checkPermission(viewlet.permission, self.context)]
 
-    def get_entries(self, viewlets):
-        return [viewlet.render() for viewlet in viewlets]
+    @property
+    def entries(self):
+        if not self.__updated:
+            raise NotImplementedError, "The menu has no been updated."
+        for viewlet in self.viewlets:
+            yield dict(
+                id=viewlet.__name__,
+                url=viewlet.url,
+                title=viewlet.title,
+                description=viewlet.description or viewlet.title or None,
+                selected = viewlet.__name__ == self.view.__name__)
     
     def update(self):
         self.__updated = True
@@ -45,17 +60,8 @@ class Menu(grokcore.viewlet.ViewletManager):
             IMenuEntry)
 
         viewlets = self.filter(viewlets)
-        viewlets = self.sort(viewlets)
-
-        # Just use the viewlets from now on
-        self.viewlets = []
-        for name, viewlet in viewlets:
-            if ILocation.providedBy(viewlet):
-                viewlet.__name__ = name
-            self.viewlets.append(viewlet)
-
+        self.viewlets = [viewlet for name, viewlet in self.sort(viewlets)]
         self._updateViewlets()
-        self.entries = self.get_entries(self.viewlets)
 
 
 class BoundEntry(object):
@@ -83,12 +89,7 @@ class BoundEntry(object):
         self.url = str("%s/%s" % (self.manager.context_url, self.__name__))
 
     def render(self):
-        return dict(
-            id=self.__name__,
-            url=self.url,
-            title=self.title,
-            description=self.description or self.title or None,
-            selected = self.__name__ == self.view.__name__)
+        pass
 
 
 class Entry(BoundEntry):

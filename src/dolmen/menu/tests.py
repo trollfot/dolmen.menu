@@ -1,16 +1,13 @@
 import os.path
 import unittest
-from zope.testing import doctest, module
-from zope.configuration.config import ConfigurationMachine
+from zope.testing import module
 from zope.app.testing import functional
 from grokcore.component.testing import grok_component
-
 
 ftesting_zcml = os.path.join(os.path.dirname(__file__), 'ftesting.zcml')
 FunctionalLayer = functional.ZCMLLayer(
     ftesting_zcml, __name__, 'FunctionalLayer', allow_teardown=True
     )
-
 
 def setUp(test):
     module.setUp(test, 'dolmen.menu.tests')

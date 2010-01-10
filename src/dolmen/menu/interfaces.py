@@ -4,26 +4,6 @@ from zope.viewlet.interfaces import IViewletManager, IViewlet
 from zope.security.zcml import Permission
 
 
-class IMenu(IViewletManager):
-    """A menu component.
-    """
-    context_url = schema.URI(
-        required=True,
-        title=u"Absolute url of the menu context")
-    
-    entries = schema.List(
-        default=[],
-        title=u"The menu entries")
-
-    menu_class = schema.TextLine(
-        default=u"menu",
-        title=u"Menu CSS class")
-
-    entry_class = schema.TextLine(
-        default=u"entry",
-        title=u"Menu entries CSS class")
-
-
 class IMenuEntry(Interface):
     """A menu entry.
     """
@@ -47,6 +27,30 @@ class IMenuEntry(Interface):
     url = schema.URI(
         required=True,
         title=u"The destination of the entry")
+
+    def update():
+        """Sets the needed attributes before rendering.
+        """
+
+    
+class IMenu(IViewletManager):
+    """A menu component.
+    """   
+    context_url = schema.URI(
+        required=True,
+        title=u"Absolute url of the menu context")
+    
+    entries = schema.Iterable(
+        default=[],
+        title=u"The menu entries")
+
+    menu_class = schema.TextLine(
+        default=u"menu",
+        title=u"Menu CSS class")
+
+    entry_class = schema.TextLine(
+        default=u"entry",
+        title=u"Menu entries CSS class")
 
 
 class IMenuEntryViewlet(IViewlet, IMenuEntry):

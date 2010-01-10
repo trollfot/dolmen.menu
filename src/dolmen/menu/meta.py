@@ -7,8 +7,7 @@ from grokcore import component, view, viewlet
 from grokcore.view.meta.views import default_view_name
 from zope import component, interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
-from zope.interface import directlyProvides
-from zope.interface.verify import verifyClass
+
 
 def generate_entry(id, name, title, description, permission):
     return type(id, (dolmen.menu.BoundEntry, ),
@@ -50,13 +49,12 @@ class ViewMenuEntriesGrokker(martian.ClassGrokker):
 
         # We enqueue our component in the registry config.
         config.action(
-            discriminator = ('viewlet', context, layer,
-                             view, menu, entry_name),
-            callable = component.provideAdapter,
-            args = (entry, (context, layer, view, menu),
-                    dolmen.menu.IMenuEntry, entry_name)
-            )
-        
+            discriminator=(
+                'viewlet', context, layer, view, menu, entry_name),
+            callable=component.provideAdapter,
+            args=(entry, (context, layer, view, menu),
+                    dolmen.menu.IMenuEntry, entry_name))
+
         return True
 
 
@@ -113,7 +111,7 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
                 raise ValueError, "Invalid menu type"
 
         factory.__view_name__ = name
-        verifyClass(dolmen.menu.IMenuEntry, factory)
+        interface.verify.verifyClass(dolmen.menu.IMenuEntry, factory)
 
         # We enqueue our component in the registry config.
         config.action(
