@@ -16,9 +16,7 @@ install_requires = [
     'martian',
     'zope.interface',
     'zope.security',
-    'grokcore.security',
     'zope.component',
-    'zope.location',
     'zope.publisher',
     'zope.schema',
     'zope.security',
@@ -31,6 +29,8 @@ tests_require = [
     'zope.app.zcmlfiles',
     'zope.securitypolicy',
     'zope.testing',
+    'zope.location',
+    'grokcore.security',
     ]
 
 setup(name = name,

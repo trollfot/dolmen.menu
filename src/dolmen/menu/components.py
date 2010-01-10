@@ -7,7 +7,6 @@ from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 from grokcore.component import baseclass
 from zope.component import getAdapters
 from zope.interface import implements, Interface
-from zope.location.interfaces import ILocation
 from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission
 from zope.traversing.browser.absoluteurl import absoluteURL
