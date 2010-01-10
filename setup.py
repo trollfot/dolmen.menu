@@ -14,14 +14,21 @@ install_requires = [
     'grokcore.viewlet',
     'grokcore.view',
     'martian',
-    'zope.interface'
-    'zope.security'
+    'zope.interface',
+    'zope.security',
+    'grokcore.security',
+    'zope.component',
+    'zope.location',
+    'zope.publisher',
+    'zope.schema',
+    'zope.security',
+    'zope.traversing',
+    'zope.viewlet',    
     ]
-
 
 tests_require = [
     'zope.configuration',
-    'zope.app.zcmlfiles'
+    'zope.app.testing'
     ]
 
 setup(name = name,
