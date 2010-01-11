@@ -20,6 +20,10 @@ class IMenuEntry(Interface):
         required=True,
         title=u"The destination of the entry")
 
+    selected = schema.Bool(
+        required=True,
+        title=u"The entry is currently selected")
+
     description = schema.Text(
         default=u"",
         title=u"Full description")
@@ -27,10 +31,6 @@ class IMenuEntry(Interface):
     url = schema.URI(
         required=True,
         title=u"The destination of the entry")
-
-    def update():
-        """Sets the needed attributes before rendering.
-        """
 
     
 class IMenu(IViewletManager):

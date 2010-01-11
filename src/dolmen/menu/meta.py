@@ -68,11 +68,6 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
     martian.directive(viewlet.name, get_default=default_view_name)
     martian.directive(dolmen.menu.menu, default=None)
     
-    def grok(self, name, factory, module_info, **kw):
-        factory.module_info = module_info
-        return super(ViewletMenuEntriesGrokker, self).grok(
-            name, factory, module_info, **kw)
-
     def execute(self, factory, config, context, menu, view, layer, name, **kw):
 
         if not context:

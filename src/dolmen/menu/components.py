@@ -13,13 +13,12 @@ from zope.traversing.browser.absoluteurl import absoluteURL
 
 from megrok.pagetemplate import IPageTemplate, PageTemplate, view
 
+
 class Menu(grokcore.viewlet.ViewletManager):
     """
     """
     baseclass()
     implements(IMenu)
-
-    template = grokcore.view.PageTemplateFile("templates/genericmenu.pt")
 
     viewlets = []
     entries = FieldProperty(IMenu['entries'])
@@ -38,6 +37,16 @@ class Menu(grokcore.viewlet.ViewletManager):
         return [(name, viewlet) for name, viewlet in viewlets
                 if checkPermission(viewlet.permission, self.context)]
 
+    @property
+    def entries(self):
+        for viewlet in self.viewlets:
+            yield dict(
+                id=viewlet.__name__,
+                url=viewlet.url,
+                title=viewlet.title,
+                description=viewlet.description or viewlet.title or None,
+                selected = viewlet.__name__ == self.view.__name__)
+
     def update(self):
         self.__updated = True
         self.title = grokcore.view.title.bind().get(self) or self.__name__
@@ -50,6 +59,12 @@ class Menu(grokcore.viewlet.ViewletManager):
         viewlets = self.filter(viewlets)
         self.viewlets = [viewlet for name, viewlet in self.sort(viewlets)]
         self._updateViewlets()
+
+    def render(self):
+        template = self.template
+        if template is None:
+            template = getMultiAdapter((self, self.request), IPageTemplate)
+        return template()
 
 
 class BoundEntry(object):
@@ -68,41 +83,19 @@ class BoundEntry(object):
         self.context = context
         self.request = request
         self.manager = manager
-        self.static = queryAdapter(
-            self.request,
-            Interface,
-            name=self.module_info.package_dotted_name
-            )
-
-    def default_namespace(self):
-        namespace = {}
-        namespace['context'] = self.context
-        namespace['request'] = self.request
-        namespace['static'] = self.static
-        namespace['view'] = self
-        namespace['viewletmanager'] = self.manager 
-        return namespace
-
-    def namespace(self):
-        return {}
 
     def __repr__(self):
         return  "<BoundEntry `%s` for menu `%s`>" % (
             self.__name__, self.manager.__name__)
 
     @property
-    def isSelected(self):
+    def selected(self):
         if self.__name__ == self.view.__name__:
             return True
         return False    
 
     def update(self):
         self.url = str("%s/%s" % (self.manager.context_url, self.__name__))
-
-
-    def render(self):
-        template = getMultiAdapter((self, self.request), IPageTemplate)
-        return template()
 
 
 
@@ -121,7 +114,6 @@ class Entry(BoundEntry):
         
 
 class MenuTemplate(PageTemplate):
-    view(IMenuEntryViewlet)
-
-    template = grokcore.view.PageTemplateFile("templates/menuentry.pt")
+    view(IMenu)
+    template = grokcore.view.PageTemplateFile("templates/genericmenu.pt")
 
