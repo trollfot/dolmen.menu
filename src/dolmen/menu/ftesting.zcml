@@ -5,7 +5,12 @@
   <include package="zope.app.zcmlfiles" file="meta.zcml" />
   <include package="zope.securitypolicy" file="meta.zcml" />
   <include package="zope.app.zcmlfiles" />
+
   <include package="dolmen.menu" />
+  <include package="grokcore.view" />
+  <include package="zope.contentprovider" />
+
+  <grok:grok package="dolmen.menu.ftests" />
 
   <!-- Security -->
   <securityPolicy

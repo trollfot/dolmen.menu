@@ -31,6 +31,7 @@ tests_require = [
     'zope.testing',
     'zope.location',
     'grokcore.security',
+    'zope.testbrowser',
     ]
 
 setup(name = name,
