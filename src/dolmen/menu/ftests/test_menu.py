@@ -47,11 +47,11 @@ import grokcore.view as view
 import grokcore.component as grok
 
 from grokcore.view import templatedir
-from zope.component import getMultiAdapter
 from dolmen.menu import Menu, Entry, menu
 from zope.interface import Interface
 
 templatedir('templates')
+
 
 class Document(grok.Context):
     pass

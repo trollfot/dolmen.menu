@@ -5,7 +5,7 @@ import grokcore.viewlet
 
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 from grokcore.component import baseclass
-from zope.component import getAdapters, getMultiAdapter, queryAdapter
+from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission

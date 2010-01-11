@@ -1,10 +1,8 @@
 import unittest
-from zope.testing import doctest, module
-from zope.configuration.config import ConfigurationMachine
+from zope.testing import module
 from grokcore.component.testing import grok_component
 from zope.app.testing import functional
 from dolmen.menu.ftests import FunctionalLayer
-
 
 
 def setUp(test):
