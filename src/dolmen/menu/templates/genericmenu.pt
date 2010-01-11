@@ -1,22 +1,12 @@
-<dl tal:condition="viewletmanager/entries"
+<dl tal:condition="viewletmanager/viewlets"
     tal:attributes="id viewletmanager/__name__;
 		    class viewletmanager/menu_class;">
   <dt tal:content="viewletmanager/title"
       tal:condition="viewletmanager/title" />
   <dd>
     <ul class="menu">
-      <tal:entries repeat="action viewletmanager/entries">
-      <li tal:condition="not: action/selected"
-	  tal:attributes="class viewletmanager/entry_class">
-	<a tal:attributes="href action/url;
-			   title action/description|action/title;"
-	     tal:content="action/title">A link</a>
-      </li>
-      <li tal:condition="action/selected"
-	  tal:attributes="class string:${viewletmanager/entry_class} selected">
-	<a tal:attributes="title action/description|action/title;"
-	   tal:content="action/title">No link, just an anchor.</a>
-      </li>
+      <tal:entries repeat="entry viewletmanager/viewlets">
+        <span tal:replace="structure entry/render"/>
       </tal:entries>
     </ul>
   </dd>

@@ -13,6 +13,7 @@ install_requires = [
     'grokcore.component',
     'grokcore.viewlet',
     'grokcore.view',
+    'megrok.pagetemplate',
     'martian',
     'zope.interface',
     'zope.security',

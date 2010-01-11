@@ -49,8 +49,6 @@ dolmen.menu
   >>> mymenu.viewlets
   [<BoundEntry `testentry` for menu `mymenu`>]
 
-  >>> list(mymenu.entries)
-  [{'url': 'http://127.0.0.1/test/testentry', 'title': 'testentry', 'selected': False, 'id': 'testentry', 'description': 'testentry'}]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -68,8 +66,6 @@ dolmen.menu
   >>> selected = TestEntry(context, request)
   >>> mymenu = MyMenu(context, request, selected)
   >>> mymenu.update()
-  >>> list(mymenu.entries)
-  [{...'selected': True...}]
 
   >>> class ProtectedEntry(view.View):
   ...   view.context(Interface)	
@@ -148,6 +144,11 @@ provide the IMenuEntry interface::
   ...     self.title = title
   ...     self.description = desc
   ...     self.url = url
+  ...   def render(self):
+  ...       return """<li class="entry">
+  ...                    <a href="%s"
+  ...                       title="%s">%s</a>
+  ...                 </li>""" %(self.url, self.title, self.title)
 
   >>> def manual_entry(context, request, view, menu):
   ...   return MyEntry(
