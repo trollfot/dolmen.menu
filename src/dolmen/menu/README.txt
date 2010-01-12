@@ -15,6 +15,7 @@ dolmen.menu
   >>> request = TestRequest()
 
   >>> class MyMenu(Menu):
+  ...   view.title('My nice menu')
   ...   view.context(Interface)
 
   >>> grok_component('mymenu', MyMenu)
@@ -47,12 +48,12 @@ dolmen.menu
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<BoundEntry `testentry` for menu `mymenu`>]
+  [<MenuEntry `testentry` for menu `mymenu`>]
 
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
-    <dt>mymenu</dt>
+    <dt>My nice menu</dt>
     <dd>
       <ul class="menu">
         <li class="entry">
@@ -79,7 +80,7 @@ Anonymous rights doesn't grant us the access to the viewlet::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<BoundEntry `testentry` for menu `mymenu`>]
+  [<MenuEntry `testentry` for menu `mymenu`>]
 
   
 Using a user with the appropriate rights, we now have both the items::
@@ -90,8 +91,8 @@ Using a user with the appropriate rights, we now have both the items::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<BoundEntry `protectedentry` for menu `mymenu`>,
-   <BoundEntry `testentry` for menu `mymenu`>]
+  [<MenuEntry `protectedentry` for menu `mymenu`>,
+   <MenuEntry `testentry` for menu `mymenu`>]
 
 Security also works with grok Permissions::
 
@@ -125,9 +126,9 @@ Manual registration
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<BoundEntry `protectedentry` for menu `mymenu`>,
-   <BoundEntry `testentry` for menu `mymenu`>,
-   <Entry `someentry` for menu `mymenu`>]
+  [<MenuEntry `protectedentry` for menu `mymenu`>,
+   <MenuEntry `testentry` for menu `mymenu`>,
+   <MenuEntry `someentry` for menu `mymenu`>]
 
   >>> endInteraction()
 
@@ -164,28 +165,30 @@ provide the IMenuEntry interface::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<BoundEntry `protectedentry` for menu `mymenu`>, <BoundEntry `testentry` for menu `mymenu`>, <dolmen.menu.tests.MyEntry object at ...>, <Entry `someentry` for menu `mymenu`>]
+  [<MenuEntry `protectedentry` for menu `mymenu`>, <MenuEntry `testentry` for menu `mymenu`>, <dolmen.menu.tests.MyEntry object at ...>, <MenuEntry `someentry` for menu `mymenu`>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
-    <dt>mymenu</dt>
+    <dt>My nice menu</dt>
     <dd>
       <ul class="menu">
         <li class="entry">
-  	  <a href="http://127.0.0.1/test/protectedentry"
-      	     title="protectedentry">protectedentry</a>
-        </li>
-        <li class="entry selected">
-  	  <a title="testentry">testentry</a>
+     	  <a href="http://127.0.0.1/test/protectedentry"
+             title="protectedentry">protectedentry</a>
+  	</li>
+        <li class="entry">
+     	  <a href="http://127.0.0.1/test/testentry"
+             title="testentry">testentry</a>
+  	</li>
+        <li class="entry">
+          <a href="http://dolmen-project.org"
+             title="Dolmen link">Dolmen link</a>
         </li>
         <li class="entry">
-  	  <a href="http://dolmen-project.org"
-	     title="Dolmen link">Dolmen link</a>
-        </li>
-        <li class="entry">
-  	  <a href="http://grok.zope.org"
-      	     title="The homepage of the Grok project">Grok website</a>
-        </li>
+     	  <a href="http://grok.zope.org"
+	     title="Grok website">Grok website</a>
+  	</li>
       </ul>
     </dd>
   </dl>
+

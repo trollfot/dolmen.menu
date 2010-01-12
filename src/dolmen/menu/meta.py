@@ -10,10 +10,9 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
 def generate_entry(id, name, title, description, permission):
-    return type(id, (dolmen.menu.BoundEntry, ),
+    return type(id, (dolmen.menu.Entry, ),
                 {'__name__': name, 'description': description,
                  'title': title, 'permission': permission})
-
 
 class ViewMenuEntriesGrokker(martian.ClassGrokker):
     martian.component(view.View)

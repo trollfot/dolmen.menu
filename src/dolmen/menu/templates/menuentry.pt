@@ -1,5 +1,0 @@
-<li tal:attributes="class viewletmanager/entry_class">
-   <a tal:attributes="href view/url;
-                      title view/title|view/description;"
-      tal:content="view/title">A link</a>
-</li>

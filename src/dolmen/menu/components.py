@@ -19,7 +19,6 @@ class Menu(grokcore.viewlet.ViewletManager):
     """
     baseclass()
     implements(IMenu)
-
     viewlets = []
     entries = FieldProperty(IMenu['entries'])
     menu_class = FieldProperty(IMenu['menu_class'])
@@ -37,15 +36,11 @@ class Menu(grokcore.viewlet.ViewletManager):
         return [(name, viewlet) for name, viewlet in viewlets
                 if checkPermission(viewlet.permission, self.context)]
 
-    @property
-    def entries(self):
-        for viewlet in self.viewlets:
-            yield dict(
-                id=viewlet.__name__,
-                url=viewlet.url,
-                title=viewlet.title,
-                description=viewlet.description or viewlet.title or None,
-                selected = viewlet.__name__ == self.view.__name__)
+    def render(self):
+        template = getattr(self, 'template', None)
+        if template is None:
+            template = getMultiAdapter((self, self.request), IPageTemplate)
+        return template()
 
     def update(self):
         self.__updated = True
@@ -60,23 +55,18 @@ class Menu(grokcore.viewlet.ViewletManager):
         self.viewlets = [viewlet for name, viewlet in self.sort(viewlets)]
         self._updateViewlets()
 
-    def render(self):
-        template = self.template
-        if template is None:
-            template = getMultiAdapter((self, self.request), IPageTemplate)
-        return template()
 
-
-class BoundEntry(object):
+class Entry(object):
     """Viewlet
     """
+    baseclass()
     implements(IMenuEntryViewlet)
-
+    grokcore.viewlet.context(Interface)
+    
     __name__ = FieldProperty(IMenuEntryViewlet['__name__'])
     description = FieldProperty(IMenuEntryViewlet['description'])
     manager = FieldProperty(IMenuEntryViewlet['manager'])
     permission = FieldProperty(IMenuEntryViewlet['permission'])
-    url = FieldProperty(IMenuEntryViewlet['url'])
 
     def __init__(self, context, request, view, manager):
         self.view = self.__parent__ = view
@@ -84,36 +74,47 @@ class BoundEntry(object):
         self.request = request
         self.manager = manager
 
-    def __repr__(self):
-        return  "<BoundEntry `%s` for menu `%s`>" % (
-            self.__name__, self.manager.__name__)
+    def default_namespace(self):
+        namespace = {}
+        namespace['context'] = self.context
+        namespace['request'] = self.request
+        namespace['view'] = self.view
+        namespace['entry'] = self
+        namespace['menu'] = self.manager
+        return namespace
+
+    def namespace(self):
+        return {}
+
+    def update(self):
+        pass
 
     @property
     def selected(self):
         if self.__name__ == self.view.__name__:
             return True
-        return False    
-
-    def update(self):
-        self.url = str("%s/%s" % (self.manager.context_url, self.__name__))
-
-
-
-class Entry(BoundEntry):
-    """A manually registered entry.
-    """
-    baseclass()
-    grokcore.viewlet.context(Interface)
-
-    def update(self):
-        pass
+        return False
 
     def __repr__(self):
-        return  "<Entry `%s` for menu `%s`>" % (
+        return  "<MenuEntry `%s` for menu `%s`>" % (
             self.__view_name__, self.manager.__name__)
-        
 
+    @property
+    def url(self):
+        return str("%s/%s" % (self.manager.context_url, self.__name__))
+
+    def render(self):
+        template = getattr(self, 'template', None)
+        if template is None:
+            template = getMultiAdapter((self, self.request), IPageTemplate)
+        return template()
+
+ 
 class MenuTemplate(PageTemplate):
     view(IMenu)
-    template = grokcore.view.PageTemplateFile("templates/genericmenu.pt")
+    template = grokcore.view.PageTemplateFile("templates/menu.pt")
 
+
+class EntryTemplate(PageTemplate):
+    view(IMenuEntry)
+    template = grokcore.view.PageTemplateFile("templates/entry.pt")
