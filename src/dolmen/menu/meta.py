@@ -2,7 +2,7 @@
 
 import martian
 import dolmen.menu
-
+import grokcore.view 
 from grokcore import component, view, viewlet
 from grokcore.view.meta.views import default_view_name
 from zope import component, interface
@@ -13,6 +13,38 @@ def generate_entry(id, name, title, description, permission):
     return type(id, (dolmen.menu.Entry, ),
                 {'__name__': name, 'description': description,
                  'title': title, 'permission': permission})
+
+
+class MenuEntryDecoratorGrokker(martian.GlobalGrokker):
+
+    def grok(self, name, module, module_info, config, **kw):
+        
+        entries = module_info.getAnnotation('grok.menuentries', [])
+        
+        for entry, args in entries:
+            name = grokcore.view.name.bind().get(entry) or default_view_name(entry)
+            title = grokcore.view.title.bind().get(entry) or name
+            description = grokcore.view.description.bind().get(entry)
+            permission = grokcore.view.require.bind().get(entry) or 'zope.View'
+            
+            # We generate the entry
+            entry_name = entry.__name__.lower()
+            entry = generate_entry(
+                entry_name, name, title, description, permission)
+
+            # We set the grok prerequisites
+            entry.__view_name__ = entry_name
+            entry.module_info = module_info
+
+            # We enqueue our component in the registry config.
+            context, layer, view, menu = args
+            config.action(
+                discriminator=(
+                    'menu-entry', context, layer, view, menu, entry_name),
+                callable=component.provideAdapter,
+                args=(entry, args, dolmen.menu.IMenuEntry, entry_name))
+        return True
+
 
 class ViewMenuEntriesGrokker(martian.ClassGrokker):
     martian.component(view.View)
@@ -31,29 +63,7 @@ class ViewMenuEntriesGrokker(martian.ClassGrokker):
     def execute(self, factory, config, context, view, layer,
                 name, title, description, permission, menu, **kw):
 
-        if menu is None:
-            return True
-
-        # We set the title to name, if none is provided.
-        if title is None:
-            title = name
-
-        # We generate the netry
-        entry_name = factory.__name__.lower()
-        entry = generate_entry(
-            entry_name, name, title, description, permission)
-
-        # We set the grok prerequisites
-        entry.__view_name__ = entry_name
-        entry.module_info = factory.module_info
-
-        # We enqueue our component in the registry config.
-        config.action(
-            discriminator=(
-                'menu-entry', context, layer, view, menu, entry_name),
-            callable=component.provideAdapter,
-            args=(entry, (context, layer, view, menu),
-                    dolmen.menu.IMenuEntry, entry_name))
+ 
 
         return True
 

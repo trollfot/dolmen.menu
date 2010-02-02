@@ -2,15 +2,20 @@
    xmlns="http://namespaces.zope.org/zope"
    xmlns:grok="http://namespaces.zope.org/grok">
 
-  <include package="zope.app.zcmlfiles" file="meta.zcml" />
+  <!-- meta files -->
+  <include package="zope.component" file="meta.zcml" />
+  <include package="zope.security" file="meta.zcml" />
   <include package="zope.securitypolicy" file="meta.zcml" />
-  <include package="zope.app.zcmlfiles" />
+  <include package="zope.principalregistry" file="meta.zcml" />
+  <include package="zope.i18n" file="meta.zcml" />
+
+  <include package="zope.security" />
+  <include package="zope.principalregistry" />
 
   <include package="dolmen.menu" />
   <include package="grokcore.view" />
-  <include package="zope.contentprovider" />
 
-  <grok:grok package="dolmen.menu.ftests" />
+  <grok:grok package="." />
 
   <!-- Security -->
   <securityPolicy
@@ -31,10 +36,10 @@
   <grantAll principal="zope.mgr" />
 
   <grant permission="zope.View"
-	 principal="zope.anybody" />
-
-  <grant permission="zope.View"
 	 principal="zope.user" />
+
+ <grant permission="zope.View"
+	 principal="zope.anybody" />
 
   <grant permission="zope.ManageContent"
 	 principal="zope.user" />

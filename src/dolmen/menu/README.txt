@@ -6,10 +6,12 @@ dolmen.menu
   >>> from grokcore import component, viewlet, view, security
   >>> from dolmen.menu import menu, Menu, Entry, IMenuEntry
   >>> from zope.interface import Interface
+  >>> from zope.site.hooks import getSite
   >>> from zope.publisher.browser import TestRequest
   >>> from zope.component import getMultiAdapter, provideAdapter
+  >>> from grokcore.component.testing import grok_component
 
-  >>> root = getRootFolder()
+  >>> root = getSite()
 
   >>> context = root['test'] = Location()
   >>> request = TestRequest()
@@ -33,9 +35,11 @@ dolmen.menu
 
   >>> mymenu = MyMenu(context, request, someview)
 
-  >>> class TestEntry(view.View):
+  >>> from dolmen.menu.decorators import menuentry
+
+  >>> @menuentry(MyMenu)
+  ... class TestEntry(view.View):
   ...   view.context(Interface)
-  ...   menu(MyMenu)
  
   >>> grok_component('test', TestEntry)
   True
@@ -70,7 +74,7 @@ dolmen.menu
 
   >>> class ProtectedEntry(view.View):
   ...   view.context(Interface)	
-  ...	view.require('zope.ManageContent')
+  ...	view.require('dolmen.Restricted')
   ...   menu(MyMenu)
  
   >>> grok_component('prot', ProtectedEntry)
@@ -126,9 +130,7 @@ Manual registration
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `protectedentry` for menu `mymenu`>,
-   <MenuEntry `testentry` for menu `mymenu`>,
-   <MenuEntry `someentry` for menu `mymenu`>]
+  [<MenuEntry `someentry` for menu `mymenu`>, <MenuEntry `protectedentry` for menu `mymenu`>, <MenuEntry `testentry` for menu `mymenu`>]
 
   >>> endInteraction()
 
@@ -165,7 +167,7 @@ provide the IMenuEntry interface::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `protectedentry` for menu `mymenu`>, <MenuEntry `testentry` for menu `mymenu`>, <dolmen.menu.tests.MyEntry object at ...>, <MenuEntry `someentry` for menu `mymenu`>]
+  [<MyEntry object at ...>, <MenuEntry `someentry` for menu `mymenu`>, <MenuEntry `protectedentry` for menu `mymenu`>, <MenuEntry `testentry` for menu `mymenu`>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -173,20 +175,20 @@ provide the IMenuEntry interface::
     <dd>
       <ul class="menu">
         <li class="entry">
-     	  <a href="http://127.0.0.1/test/protectedentry"
-             title="protectedentry">protectedentry</a>
-  	</li>
-        <li class="entry">
-     	  <a href="http://127.0.0.1/test/testentry"
-             title="testentry">testentry</a>
-  	</li>
-        <li class="entry">
           <a href="http://dolmen-project.org"
              title="Dolmen link">Dolmen link</a>
         </li>
         <li class="entry">
      	  <a href="http://grok.zope.org"
 	     title="Grok website">Grok website</a>
+  	</li>
+        <li class="entry">
+     	  <a href="http://127.0.0.1/test/protectedentry"
+             title="protectedentry">protectedentry</a>
+  	</li>
+        <li class="entry">
+     	  <a href="http://127.0.0.1/test/testentry"
+             title="testentry">testentry</a>
   	</li>
       </ul>
     </dd>

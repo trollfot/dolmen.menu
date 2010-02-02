@@ -26,8 +26,6 @@ install_requires = [
     ]
 
 tests_require = [
-    'zope.app.testing',
-    'zope.app.zcmlfiles',
     'zope.securitypolicy',
     'zope.testing',
     'zope.location',
