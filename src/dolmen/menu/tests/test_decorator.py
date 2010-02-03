@@ -1,4 +1,5 @@
 """
+  >>> grok(__name__)
   >>> root = getSite()
 
   >>> context = root['test'] = Location()
@@ -51,7 +52,7 @@ Using a user with the appropriate rights, we now have both the items::
    <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
 
 """
-
+from grokcore.component.testing import grok
 from zope.location.location import Location
 from grokcore import view, security
 from dolmen.menu import menuentry, Menu, Entry, IMenuEntry, IMenu

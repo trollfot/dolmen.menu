@@ -15,8 +15,6 @@
   <include package="dolmen.menu" />
   <include package="grokcore.view" />
 
-  <grok:grok package="." />
-
   <!-- Security -->
   <securityPolicy
       component="zope.securitypolicy.zopepolicy.ZopeSecurityPolicy"
