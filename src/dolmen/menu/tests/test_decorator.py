@@ -19,16 +19,22 @@
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `testentry` for menu `mymenu`>,
+  [<MenuEntry `entrywithdetails` for menu `mymenu`>,
+   <MenuEntry `testentry` for menu `mymenu`>,
    <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
     <dt>My nice menu</dt>
     <dd>
-      <ul class="menu">
+      <ul>
         <li class="entry">
-    	  <a href="http://127.0.0.1/test/testentry"
+          <a alt="This is a nice view."
+             href="http://127.0.0.1/test/entrywithdetails"
+             title="Nice view">Nice view</a>
+        </li>
+        <li class="entry">
+    	  <a alt="" href="http://127.0.0.1/test/testentry"
     	     title="testentry">testentry</a>
     	</li>
         <li class="entry">
@@ -47,7 +53,8 @@ Using a user with the appropriate rights, we now have both the items::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `protectedentry` for menu `mymenu`>,
+  [<MenuEntry `entrywithdetails` for menu `mymenu`>, 
+   <MenuEntry `protectedentry` for menu `mymenu`>,
    <MenuEntry `testentry` for menu `mymenu`>,
    <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
 
@@ -90,6 +97,12 @@ class ProtectedEntry(view.View):
         return "I'm a restricted view"
 
 
+@menuentry(MyMenu, title='Nice view', description='This is a nice view.')
+class EntryWithDetails(view.View):
+    def render(self):
+        return u"A simple entry"
+
+
 class MyEntry(object):
     """A very basic entry.
     """
@@ -101,10 +114,8 @@ class MyEntry(object):
         self.url = url
 
     def render(self):
-        return """<li class="entry">
-        <a href="%s"
-        title="%s">%s</a>
-    </li>""" %(self.url, self.title, self.title)
+        return """<a href="%s" title="%s">%s</a>""" % (
+            self.url, self.title, self.title)
 
 
 @menuentry(MyMenu)

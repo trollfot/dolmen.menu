@@ -4,9 +4,11 @@
   <dt tal:content="viewletmanager/title"
       tal:condition="viewletmanager/title" />
   <dd>
-    <ul class="menu">
-      <tal:entries repeat="action viewletmanager/viewlets"
-		   content="structure action/render" />
+    <ul>
+      <li tal:attributes="class viewletmanager/entry_class"
+	  tal:repeat="action viewletmanager/viewlets">
+	<tal:entry content="structure action/render" />
+      </li>
     </ul>
   </dd>
 </dl>

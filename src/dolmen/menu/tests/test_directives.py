@@ -25,9 +25,9 @@
   <dl id="navigationmenu" class="menu">
     <dt>My nice menu</dt>
       <dd>
-        <ul class="menu">
+        <ul>
           <li class="entry">
-            <a href="http://127.0.0.1/test/anotherview"
+            <a alt="" href="http://127.0.0.1/test/anotherview"
                title="anotherview">anotherview</a>
          </li>
       </ul>

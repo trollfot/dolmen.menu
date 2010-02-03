@@ -1,5 +1,4 @@
-<li tal:attributes="class menu/entry_class">
-   <a tal:attributes="href entry/url;
-                      title entry/title|entry/description;"
-      tal:content="entry/title">A link</a>
-</li>
+<a tal:content="entry/title"
+   tal:attributes="href entry/url;
+		   title entry/title|entry/description;
+		   alt entry/description">A link</a>
