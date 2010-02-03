@@ -18,7 +18,8 @@
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `testentry` for menu `mymenu`>]
+  [<MenuEntry `testentry` for menu `mymenu`>,
+   <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -29,6 +30,10 @@
     	  <a href="http://127.0.0.1/test/testentry"
     	     title="testentry">testentry</a>
     	</li>
+        <li class="entry">
+          <a href="http://dolmen-project.org"
+             title="Dolmen link">Dolmen link</a>
+        </li>
       </ul>
     </dd>
   </dl>
@@ -42,18 +47,17 @@ Using a user with the appropriate rights, we now have both the items::
   >>> mymenu.update()
   >>> mymenu.viewlets
   [<MenuEntry `protectedentry` for menu `mymenu`>,
-   <MenuEntry `testentry` for menu `mymenu`>]
+   <MenuEntry `testentry` for menu `mymenu`>,
+   <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
 
 """
 
 from zope.location.location import Location
 from grokcore import view, security
-from dolmen.menu import menu, Menu, Entry, IMenuEntry
+from dolmen.menu import menuentry, Menu, Entry, IMenuEntry, IMenu
 from zope.interface import Interface
 from zope.site.hooks import getSite
-from zope.publisher.browser import TestRequest
-from dolmen.menu.decorator import menuentry
- 
+from zope.publisher.browser import TestRequest 
 
 view.context(Interface)
 
@@ -83,6 +87,28 @@ class ProtectedEntry(view.View):
 
     def render(self):
         return "I'm a restricted view"
+
+
+class MyEntry(object):
+    """A very basic entry.
+    """
+    def __init__(self, id, title, url, desc=u"", perm='zope.View'):
+        self.__name__ = id
+        self.permission = perm
+        self.title = title
+        self.description = desc
+        self.url = url
+
+    def render(self):
+        return """<li class="entry">
+        <a href="%s"
+        title="%s">%s</a>
+    </li>""" %(self.url, self.title, self.title)
+
+
+@menuentry(MyMenu)
+def manual_entry(context, request, view, menu):
+   return MyEntry('an_entry', 'Dolmen link', url="http://dolmen-project.org")
 
 
 def test_suite():

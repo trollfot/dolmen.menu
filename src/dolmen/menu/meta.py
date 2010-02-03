@@ -46,28 +46,6 @@ class MenuEntryDecoratorGrokker(martian.GlobalGrokker):
         return True
 
 
-class ViewMenuEntriesGrokker(martian.ClassGrokker):
-    martian.component(view.View)
-
-    martian.directive(view.title, default=None)
-    martian.directive(view.context)
-    martian.directive(view.description, default=u"")
-    martian.directive(view.name, get_default=default_view_name)
-    martian.directive(view.layer, default=IDefaultBrowserLayer)
-    martian.directive(view.require, name='permission', default='zope.View')
-    
-    martian.directive(viewlet.view, default=interface.Interface)
-    martian.directive(dolmen.menu.menu, default=None)
-    
-
-    def execute(self, factory, config, context, view, layer,
-                name, title, description, permission, menu, **kw):
-
- 
-
-        return True
-
-
 class ViewletMenuEntriesGrokker(martian.ClassGrokker):
     martian.component(dolmen.menu.Entry)
 
