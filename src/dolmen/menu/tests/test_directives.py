@@ -67,9 +67,9 @@ def test_suite():
     from zope.testing import doctest
     
     suite = unittest.TestSuite()
-    decorators = doctest.DocTestSuite(
+    mytest = doctest.DocTestSuite(
         setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
         optionflags=(doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS))
-    decorators.layer = tests.DolmenMenuLayer(tests.test_directives)
-    suite.addTest(decorators)
+    mytest.layer = tests.DolmenMenuLayer(tests.test_directives)
+    suite.addTest(mytest)
     return suite
