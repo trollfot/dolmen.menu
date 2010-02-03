@@ -45,7 +45,7 @@ class MenuEntryDecoratorGrokker(martian.GlobalGrokker):
 class GlobalMenuEntryGrokker(martian.GlobalGrokker):
 
     def grok(self, name, module, module_info, config, **kw):
-        entries = dolmen.menu.global_menuentry.bind().get(module)
+        entries = dolmen.menu.global_menuentry.bind().get(module=module)
         for factory, menu, infos in entries:
             register_entry(factory, menu, infos, config)
         return True

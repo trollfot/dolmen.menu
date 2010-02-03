@@ -72,11 +72,11 @@ class menuentry:
         frame = sys._getframe(1)
         if not frame_is_module(frame):
             raise GrokImportError(
-                "@dolmen.menu.menuitem can only be used at the module level")
+                "@dolmen.menu.menuentry can only be used at the module level")
 
         if not self.menu:
             raise GrokImportError(
-                "@dolmen.menu.menuitem requires at least one argument.")
+                "@dolmen.menu.menuentry requires at least one argument.")
 
         values = get_entry_values(entry, **self.infos)
         context = values.get('context')

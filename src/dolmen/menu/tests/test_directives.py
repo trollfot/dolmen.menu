@@ -11,13 +11,28 @@
 
   >>> navigation = NavigationMenu(context, request, current_view)
 
+  >>> from zope.security.testing import Principal, Participation
+  >>> from zope.security.management import newInteraction, endInteraction
+
+  >>> participation = Participation(Principal('zope.anybody'))
+  >>> newInteraction(participation)
+
   >>> navigation.update()
   >>> navigation.viewlets
-  []
+  [<MenuEntry `anotherview` for menu `navigationmenu`>]
 
   >>> print navigation.render()
-
-
+  <dl id="navigationmenu" class="menu">
+    <dt>My nice menu</dt>
+      <dd>
+        <ul class="menu">
+          <li class="entry">
+            <a href="http://127.0.0.1/test/anotherview"
+               title="anotherview">anotherview</a>
+         </li>
+      </ul>
+    </dd>
+  </dl>
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location
