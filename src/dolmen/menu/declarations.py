@@ -25,6 +25,7 @@ EXTRACTABLES = {
     'order':       grokcore.viewlet.order.bind(),
     }
 
+
 def get_entry_values(factory, **extras):
     values = {}
     for name, directive in EXTRACTABLES.items():

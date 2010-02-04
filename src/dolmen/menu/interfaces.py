@@ -32,8 +32,6 @@ class IMenuEntry(Interface):
         required=True,
         title=u"The destination of the entry")
 
-    order = Attribute("Determines the order of the entry.")
-
     
 class IMenu(IViewletManager):
     """A menu component.

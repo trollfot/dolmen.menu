@@ -18,11 +18,18 @@ def register_entry(factory, menu, infos, config=None):
     # We get the values from the directives
     values = dolmen.menu.get_entry_values(factory, **infos)
             
-    # We generate the entry
+    # We pop the values issued from directives.
     context = values.pop('context')
     view = values.pop('view')
     layer = values.pop('layer')
+    order = values.pop('order')
+
+    # We generate the entry.
     entry_name, entry = generate_entry(values)
+
+    # If order was not from a directive, we set it back, for later sorting.
+    if not isinstance(order, tuple):
+        viewlet.order.set(entry, (order, 1))
     
     # We enqueue our component in the registry config.
     config.action(
@@ -74,7 +81,7 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
             if not dolmen.menu.IMenu.implementedBy(menu):
                 raise ValueError, "Invalid menu type"
 
-        factory.__view_name__ = name
+        factory.__name__ = factory.__view_name__ = name
         interface.verify.verifyClass(dolmen.menu.IMenuEntry, factory)
 
         # We enqueue our component in the registry config.

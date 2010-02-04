@@ -19,13 +19,18 @@
 
   >>> navigation.update()
   >>> navigation.viewlets
-  [<MenuEntry `anotherview` for menu `navigationmenu`>]
+  [<MenuEntry `a_direct_entry` for menu `navigationmenu`>,
+   <MenuEntry `anotherview` for menu `navigationmenu`>]
 
   >>> print navigation.render()
   <dl id="navigationmenu" class="menu">
     <dt>My nice menu</dt>
       <dd>
         <ul>
+          <li class="entry">
+    	    <a href="http://127.0.0.1/test/a_direct_entry"
+               title="My Entry">My Entry</a>
+          </li>
           <li class="entry">
             <a alt="" href="http://127.0.0.1/test/anotherview"
                title="anotherview">anotherview</a>
@@ -38,8 +43,8 @@
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location
-from grokcore import view, security
-from dolmen.menu import global_menuentry, Menu, Entry, IMenuEntry, IMenu
+from grokcore import view, security, viewlet
+from dolmen.menu import global_menuentry, menu, Menu, Entry
 from zope.interface import Interface
 from zope.site.hooks import getSite
 from zope.publisher.browser import TestRequest 
@@ -60,7 +65,14 @@ class AnotherView(view.View):
         return u"I'm a view and I want to be a menu entry"
 
 
-global_menuentry(AnotherView, NavigationMenu)
+class MyMenuEntry(Entry):
+    viewlet.order(1)
+    viewlet.name('a_direct_entry')
+    viewlet.title('My Entry')
+    menu(NavigationMenu)
+    
+
+global_menuentry(AnotherView, NavigationMenu, order=2)
 
 
 def test_suite():

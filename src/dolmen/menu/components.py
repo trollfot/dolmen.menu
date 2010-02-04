@@ -13,10 +13,6 @@ from zope.security import checkPermission
 from zope.traversing.browser.absoluteurl import absoluteURL
 
 
-def sort_on_order(a, b):
-    return a.order < b.order
-
-
 class Menu(grokcore.viewlet.ViewletManager):
     """Viewlet Manager working as a menu.
     """
@@ -27,16 +23,6 @@ class Menu(grokcore.viewlet.ViewletManager):
     menu_class = FieldProperty(IMenu['menu_class'])
     entry_class = FieldProperty(IMenu['entry_class'])
     context_url = FieldProperty(IMenu['context_url'])
-
-    def sort(self, viewlets):
-        """Sort the menu entries.
-        """
-        s_viewlets = []
-        for name, viewlet in viewlets:
-             viewlet.__viewlet_name__ = name
-             s_viewlets.append(viewlet)
-        s_viewlets.sort(sort_on_order)
-        return s_viewlets
 
     def _updateViewlets(self):
         """Doesn't fire events, like the original ViewletManager, on purpose.
@@ -57,7 +43,7 @@ class Menu(grokcore.viewlet.ViewletManager):
 
     def update(self):
         self.__updated = True
-        self.title = grokcore.view.title.bind().get(self) or self.__name__
+        self.title = grokcore.view.title.bind(default=self.__name__).get(self)
         self.context_url = absoluteURL(self.context, self.request)
         # Find all content providers for the region
         viewlets = getAdapters(
@@ -65,7 +51,7 @@ class Menu(grokcore.viewlet.ViewletManager):
             IMenuEntry)
 
         viewlets = self.filter(viewlets)
-        self.viewlets = [viewlet for viewlet in self.sort(viewlets)]
+        self.viewlets = [viewlet for name, viewlet in self.sort(viewlets)]
         self._updateViewlets()
 
 
@@ -76,16 +62,16 @@ class Entry(object):
     implements(IMenuEntryViewlet)
     grokcore.viewlet.context(Interface)
     
-    __name__ = FieldProperty(IMenuEntryViewlet['__name__'])
-    description = FieldProperty(IMenuEntryViewlet['description'])
-    manager = FieldProperty(IMenuEntryViewlet['manager'])
-    permission = FieldProperty(IMenuEntryViewlet['permission'])
-
     def __init__(self, context, request, view, manager):
         self.view = self.__parent__ = view
         self.context = context
         self.request = request
         self.manager = manager
+        self.__name__ = self.__view_name__
+
+    def __repr__(self):
+        return  "<MenuEntry `%s` for menu `%s`>" % (
+            self.__view_name__, self.manager.__name__)
 
     def default_namespace(self):
         namespace = {}
@@ -108,14 +94,22 @@ class Entry(object):
             return True
         return False
 
-    def __repr__(self):
-        return  "<MenuEntry `%s` for menu `%s`>" % (
-            self.__view_name__, self.manager.__name__)
-
     @property
     def url(self):
         return str("%s/%s" % (self.manager.context_url, self.__name__))
 
+    @property
+    def title(self):
+        return grokcore.viewlet.title.bind(default=self.__name__).get(self)
+
+    @property
+    def permission(self):
+        return grokcore.viewlet.require.bind().get(self)
+
+    @property
+    def description(self):
+        return grokcore.viewlet.description.bind(default=None).get(self)
+    
     def render(self):
         template = getattr(self, 'template', None)
         if template is None:
