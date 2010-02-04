@@ -33,6 +33,8 @@
       </ul>
     </dd>
   </dl>
+
+  >>> endInteraction()
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location

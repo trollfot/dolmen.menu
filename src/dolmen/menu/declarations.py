@@ -63,7 +63,6 @@ class global_menuentry(martian.MultipleTimesDirective):
 class menuentry:
     """Annotates the class for further grokking
     """
-
     def __init__(self, menu, **args):
         self.menu = menu
         self.infos = args

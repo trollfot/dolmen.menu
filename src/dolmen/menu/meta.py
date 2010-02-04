@@ -9,9 +9,9 @@ from zope import component, interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
-def generate_entry(id, bdict):
-    bdict['__view_name__'] = bdict['__name__'] = bdict['name']
-    return type(id, (dolmen.menu.Entry,), bdict)
+def generate_entry(bdict):
+    id = bdict['__view_name__'] = bdict['__name__'] = bdict['name']
+    return id, type(id, (dolmen.menu.Entry,), bdict)
 
 
 def register_entry(factory, menu, infos, config=None):
@@ -19,11 +19,10 @@ def register_entry(factory, menu, infos, config=None):
     values = dolmen.menu.get_entry_values(factory, **infos)
             
     # We generate the entry
-    entry_name = factory.__name__.lower()
     context = values.pop('context')
     view = values.pop('view')
     layer = values.pop('layer')
-    entry = generate_entry(entry_name, values)
+    entry_name, entry = generate_entry(values)
     
     # We enqueue our component in the registry config.
     config.action(

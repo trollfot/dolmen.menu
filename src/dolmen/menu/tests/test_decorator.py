@@ -19,9 +19,9 @@
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `entrywithdetails` for menu `mymenu`>,
+  [<dolmen.menu.tests.test_decorator.MyEntry object at ...>,
    <MenuEntry `testentry` for menu `mymenu`>,
-   <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
+   <MenuEntry `entrywithdetails` for menu `mymenu`>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -29,17 +29,17 @@
     <dd>
       <ul>
         <li class="entry">
-          <a alt="This is a nice view."
-             href="http://127.0.0.1/test/entrywithdetails"
-             title="Nice view">Nice view</a>
+          <a href="http://dolmen-project.org"
+             title="Dolmen link">Dolmen link</a>
         </li>
         <li class="entry">
     	  <a alt="" href="http://127.0.0.1/test/testentry"
     	     title="testentry">testentry</a>
     	</li>
         <li class="entry">
-          <a href="http://dolmen-project.org"
-             title="Dolmen link">Dolmen link</a>
+          <a alt="This is a nice view."
+             href="http://127.0.0.1/test/entrywithdetails"
+             title="Nice view">Nice view</a>
         </li>
       </ul>
     </dd>
@@ -53,11 +53,12 @@ Using a user with the appropriate rights, we now have both the items::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `entrywithdetails` for menu `mymenu`>, 
-   <MenuEntry `protectedentry` for menu `mymenu`>,
+  [<dolmen.menu.tests.test_decorator.MyEntry object at ...>,
    <MenuEntry `testentry` for menu `mymenu`>,
-   <dolmen.menu.tests.test_decorator.MyEntry object at ...>]
+   <MenuEntry `protectedentry` for menu `mymenu`>,
+   <MenuEntry `entrywithdetails` for menu `mymenu`>]
 
+  >>> endInteraction()
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location
@@ -112,6 +113,7 @@ class MyEntry(object):
         self.title = title
         self.description = desc
         self.url = url
+        self.order = 0
 
     def render(self):
         return """<a href="%s" title="%s">%s</a>""" % (

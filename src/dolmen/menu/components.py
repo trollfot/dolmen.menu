@@ -5,17 +5,20 @@ import grokcore.viewlet
 
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 from grokcore.component import baseclass
+from megrok.pagetemplate import IPageTemplate, PageTemplate, view
 from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission
 from zope.traversing.browser.absoluteurl import absoluteURL
 
-from megrok.pagetemplate import IPageTemplate, PageTemplate, view
+
+def sort_on_order(a, b):
+    return a.order < b.order
 
 
 class Menu(grokcore.viewlet.ViewletManager):
-    """
+    """Viewlet Manager working as a menu.
     """
     baseclass()
     implements(IMenu)
@@ -24,6 +27,16 @@ class Menu(grokcore.viewlet.ViewletManager):
     menu_class = FieldProperty(IMenu['menu_class'])
     entry_class = FieldProperty(IMenu['entry_class'])
     context_url = FieldProperty(IMenu['context_url'])
+
+    def sort(self, viewlets):
+        """Sort the menu entries.
+        """
+        s_viewlets = []
+        for name, viewlet in viewlets:
+             viewlet.__viewlet_name__ = name
+             s_viewlets.append(viewlet)
+        s_viewlets.sort(sort_on_order)
+        return s_viewlets
 
     def _updateViewlets(self):
         """Doesn't fire events, like the original ViewletManager, on purpose.
@@ -52,7 +65,7 @@ class Menu(grokcore.viewlet.ViewletManager):
             IMenuEntry)
 
         viewlets = self.filter(viewlets)
-        self.viewlets = [viewlet for name, viewlet in self.sort(viewlets)]
+        self.viewlets = [viewlet for viewlet in self.sort(viewlets)]
         self._updateViewlets()
 
 

@@ -1,12 +1,12 @@
 from zope import schema
-from zope.interface import Interface
+from zope.interface import Interface, Attribute
 from zope.viewlet.interfaces import IViewletManager, IViewlet
 from zope.security.zcml import Permission
 
 
 class IMenuEntry(Interface):
     """A menu entry.
-    """
+    """    
     __name__ = schema.ASCIILine(
         title=u"Identifier",
         required=True)
@@ -31,6 +31,8 @@ class IMenuEntry(Interface):
     url = schema.URI(
         required=True,
         title=u"The destination of the entry")
+
+    order = Attribute("Determines the order of the entry.")
 
     
 class IMenu(IViewletManager):
