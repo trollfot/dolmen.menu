@@ -61,7 +61,7 @@ class Entry(object):
     baseclass()
     implements(IMenuEntryViewlet)
     grokcore.viewlet.context(Interface)
-    
+
     def __init__(self, context, request, view, manager):
         self.view = self.__parent__ = view
         self.context = context
@@ -109,14 +109,14 @@ class Entry(object):
     @property
     def description(self):
         return grokcore.viewlet.description.bind(default=None).get(self)
-    
+
     def render(self):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), IPageTemplate)
         return template()
 
- 
+
 class MenuTemplate(PageTemplate):
     view(IMenu)
     template = grokcore.view.PageTemplateFile("templates/menu.pt")

@@ -15,14 +15,14 @@ from grokcore.view.meta.views import default_view_name
 
 
 EXTRACTABLES = {
-    'name':        grokcore.viewlet.name.bind(get_default=default_view_name),
-    'title':       grokcore.viewlet.title.bind(get_default=default_view_name),
+    'name': grokcore.viewlet.name.bind(get_default=default_view_name),
+    'title': grokcore.viewlet.title.bind(get_default=default_view_name),
     'description': grokcore.viewlet.description.bind(default=u""),
-    'context':     grokcore.viewlet.context.bind(default=Interface),
-    'layer':       grokcore.viewlet.layer.bind(default=IDefaultBrowserLayer),
-    'view':        grokcore.viewlet.view.bind(default=Interface),
-    'permission':  grokcore.viewlet.require.bind(default='zope.View'),
-    'order':       grokcore.viewlet.order.bind(),
+    'context': grokcore.viewlet.context.bind(default=Interface),
+    'layer': grokcore.viewlet.layer.bind(default=IDefaultBrowserLayer),
+    'view': grokcore.viewlet.view.bind(default=Interface),
+    'permission': grokcore.viewlet.require.bind(default='zope.View'),
+    'order': grokcore.viewlet.order.bind(),
     }
 
 
@@ -64,10 +64,11 @@ class global_menuentry(martian.MultipleTimesDirective):
 class menuentry:
     """Annotates the class for further grokking
     """
+
     def __init__(self, menu, **args):
         self.menu = menu
         self.infos = args
-        
+
     def __call__(self, entry):
         frame = sys._getframe(1)
         if not frame_is_module(frame):
@@ -83,14 +84,14 @@ class menuentry:
         view = values.get('view')
         layer = values.get('layer')
         menu = self.menu
-        
+
         if type(entry) is types.FunctionType:
             adapter = zope.component.adapter(context, layer, view, menu)
             implementer = zope.interface.implementer(IMenuEntry)
 
             adapter(entry)
             implementer(entry)
-            
+
             adapters = frame.f_locals.get('__grok_adapters__', None)
             if adapters is None:
                 frame.f_locals['__grok_adapters__'] = adapters = []
