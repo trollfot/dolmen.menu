@@ -22,7 +22,7 @@ install_requires = [
     'zope.schema',
     'zope.security',
     'zope.traversing',
-    'zope.viewlet',    
+    'zope.viewlet',
     ]
 
 tests_require = [
@@ -30,8 +30,10 @@ tests_require = [
     'zope.testing',
     'zope.location',
     'grokcore.security',
-    'zope.testbrowser',
-    'zope.contentprovider',
+    'zope.site',
+    'zope.container',
+    'zope.i18n',
+    'zope.principalregistry',
     ]
 
 setup(name = name,
