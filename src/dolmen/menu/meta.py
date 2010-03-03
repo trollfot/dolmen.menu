@@ -2,7 +2,7 @@
 
 import martian
 import dolmen.menu
-import grokcore.viewlet
+
 from grokcore import component, view, viewlet
 from grokcore.view.meta.views import default_view_name
 from zope import component, interface

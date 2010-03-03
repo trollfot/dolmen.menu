@@ -1,9 +1,6 @@
 #-*- coding: utf-8 -*-
 
-import unittest
 import zope.component
-import dolmen.menu
-
 from zope.component.interfaces import IComponentLookup
 from zope.component.testlayer import ZCMLFileLayer
 from zope.container.interfaces import ISimpleReadContainer
@@ -11,7 +8,6 @@ from zope.container.traversal import ContainerTraversable
 from zope.interface import Interface
 from zope.site.folder import rootFolder
 from zope.site.site import LocalSiteManager, SiteManagerAdapter
-from zope.testing import doctest
 from zope.traversing.interfaces import ITraversable
 from zope.traversing.testing import setUp
 
