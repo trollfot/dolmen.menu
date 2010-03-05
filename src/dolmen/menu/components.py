@@ -24,6 +24,10 @@ class Menu(grokcore.viewlet.ViewletManager):
     entry_class = FieldProperty(IMenu['entry_class'])
     context_url = FieldProperty(IMenu['context_url'])
 
+    @property
+    def id(self):
+        return self.__name__.replace('.', '-')
+
     def _updateViewlets(self):
         """Doesn't fire events, like the original ViewletManager, on purpose.
         """

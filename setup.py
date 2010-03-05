@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '0.1'
+version = '0.2'
 readme = open(join('src', 'dolmen', 'menu', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -38,7 +38,7 @@ tests_require = [
 
 setup(name = name,
       version = version,
-      description = 'Dolmen menu',
+      description = 'Dolmen menus composer',
       long_description = readme + '\n\n' + history,
       keywords = 'Grok Zope3 CMS Dolmen',
       author = 'Souheil Chelfouh',
