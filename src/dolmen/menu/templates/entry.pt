@@ -1,4 +1,5 @@
 <a tal:content="entry/title"
    tal:attributes="href entry/url;
+		   class python:entry.selected and 'selected' or None;
 		   title entry/title|entry/description;
 		   alt entry/description">A link</a>

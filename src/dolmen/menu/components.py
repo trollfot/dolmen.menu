@@ -10,6 +10,7 @@ from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission
+from zope.security.checker import CheckerPublic
 from zope.traversing.browser.absoluteurl import absoluteURL
 
 
@@ -36,8 +37,13 @@ class Menu(grokcore.viewlet.ViewletManager):
                 viewlet.update()
 
     def filter(self, viewlets):
-        return [(name, viewlet) for name, viewlet in viewlets
-                if checkPermission(viewlet.permission, self.context)]
+        for name, viewlet in viewlets:
+            permission = viewlet.permission
+            if permission == 'zope.Public':
+                # Translate public permission to CheckerPublic
+                permission = CheckerPublic
+            if checkPermission(permission, self.context):
+                yield name, viewlet
 
     def render(self):
         template = getattr(self, 'template', None)

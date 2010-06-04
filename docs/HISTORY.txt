@@ -1,6 +1,16 @@
 Changes
 =======
 
+0.3 (2010-06-04)
+================
+
+* Corrected a bug where 'zope.Public' was evaluated as a "normal"
+  permission. Now, the manager converts the permission into a
+  CheckerPublic marker.
+
+* the ``filter`` method is now a generator.
+
+
 0.2 (2010-03-05)
 ================
 

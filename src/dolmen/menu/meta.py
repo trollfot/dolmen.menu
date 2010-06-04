@@ -59,7 +59,6 @@ class GlobalMenuEntryGrokker(martian.GlobalGrokker):
 
 class ViewletMenuEntriesGrokker(martian.ClassGrokker):
     martian.component(dolmen.menu.Entry)
-
     martian.directive(viewlet.context)
     martian.directive(viewlet.view, default=interface.Interface)
     martian.directive(viewlet.layer, default=IDefaultBrowserLayer)
