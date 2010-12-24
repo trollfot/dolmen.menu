@@ -70,20 +70,19 @@ class MyMenuEntry(Entry):
     viewlet.name('a_direct_entry')
     viewlet.title('My Entry')
     menu(NavigationMenu)
-    
+
 
 global_menuentry(AnotherView, NavigationMenu, order=2)
 
 
 def test_suite():
-    import unittest
+    import unittest, doctest
     from dolmen.menu import tests
-    from zope.testing import doctest
-    
+
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(
         setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
         optionflags=(doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS))
-    mytest.layer = tests.DolmenMenuLayer(tests.test_directives)
+    mytest.layer = tests.DolmenMenuLayer(tests)
     suite.addTest(mytest)
     return suite

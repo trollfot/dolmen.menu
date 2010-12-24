@@ -131,14 +131,13 @@ def manual_entry(context, request, view, menu):
 
 
 def test_suite():
-    import unittest
+    import unittest, doctest
     from dolmen.menu import tests
-    from zope.testing import doctest
-    
+
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(
         setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
         optionflags=(doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS))
-    mytest.layer = tests.DolmenMenuLayer(tests.test_decorator)
+    mytest.layer = tests.DolmenMenuLayer(tests)
     suite.addTest(mytest)
     return suite

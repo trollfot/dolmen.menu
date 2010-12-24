@@ -2,6 +2,7 @@
 
 from zope import schema
 from zope.interface import Interface
+from zope.location import ILocation
 from zope.viewlet.interfaces import IViewletManager, IViewlet
 from zope.security.zcml import Permission
 
@@ -38,6 +39,12 @@ class IMenuEntry(Interface):
 class IMenu(IViewletManager):
     """A menu component.
     """
+    menu_context = schema.Object(
+        schema=ILocation,
+        default=None,
+        required=False,
+        title=u"Menu context object")
+    
     context_url = schema.URI(
         required=True,
         title=u"Absolute url of the menu context")

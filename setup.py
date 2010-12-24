@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '0.3'
+version = '0.4'
 readme = open(join('src', 'dolmen', 'menu', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -27,7 +27,6 @@ install_requires = [
 
 tests_require = [
     'zope.securitypolicy',
-    'zope.testing',
     'zope.location',
     'grokcore.security',
     'zope.site',

@@ -1,8 +1,16 @@
 Changes
 =======
 
+0.4 (2010-12-24)
+----------------
+
+* It is now possible to define a menu context, that is different of
+  the rendering context. This allow delegated rendering, such as Root
+  menus or other object-specific menus.
+
+
 0.3 (2010-06-04)
-================
+----------------
 
 * Corrected a bug where 'zope.Public' was evaluated as a "normal"
   permission. Now, the manager converts the permission into a
@@ -12,12 +20,12 @@ Changes
 
 
 0.2 (2010-03-05)
-================
+----------------
 
 * Changed the way to fetch the menu CSS id.
 
 
 0.1 (2010-03-03)
-================
+----------------
 
 * Initial release.

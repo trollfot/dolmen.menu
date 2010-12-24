@@ -20,14 +20,22 @@ class Menu(grokcore.viewlet.ViewletManager):
     baseclass()
     implements(IMenu)
     viewlets = []
+
     entries = FieldProperty(IMenu['entries'])
     menu_class = FieldProperty(IMenu['menu_class'])
     entry_class = FieldProperty(IMenu['entry_class'])
     context_url = FieldProperty(IMenu['context_url'])
+    menu_context = FieldProperty(IMenu['menu_context'])
 
     @property
     def id(self):
         return self.__name__.replace('.', '-')
+
+    def setMenuContext(self, item):
+        self.menu_context = item
+
+    def getMenuContext(self):
+        return self.menu_context or self.context
 
     def _updateViewlets(self):
         """Doesn't fire events, like the original ViewletManager, on purpose.
@@ -54,10 +62,16 @@ class Menu(grokcore.viewlet.ViewletManager):
     def update(self):
         self.__updated = True
         self.title = grokcore.view.title.bind(default=self.__name__).get(self)
-        self.context_url = absoluteURL(self.context, self.request)
+
+        # We get the real context
+        menu_context = self.getMenuContext()
+
+        # Get the MenuContext and calculate its url
+        self.context_url = absoluteURL(menu_context, self.request)
+        
         # Find all content providers for the region
         viewlets = getAdapters(
-            (self.context, self.request, self.__parent__, self),
+            (menu_context, self.request, self.__parent__, self),
             IMenuEntry)
 
         viewlets = self.filter(viewlets)
