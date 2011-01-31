@@ -15,6 +15,7 @@ install_requires = [
     'grokcore.view',
     'megrok.pagetemplate',
     'martian',
+    'zope.location',
     'zope.interface',
     'zope.security',
     'zope.component',

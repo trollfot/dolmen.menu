@@ -2,8 +2,8 @@
 
 import martian
 import dolmen.menu
+import grokcore.view
 
-from grokcore import viewlet
 from grokcore.view.meta.views import default_view_name
 from zope import component, interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
@@ -29,7 +29,7 @@ def register_entry(factory, menu, infos, config=None):
 
     # If order was not from a directive, we set it back, for later sorting.
     if not isinstance(order, tuple):
-        viewlet.order.set(entry, (order, 1))
+        grokcore.view.order.set(entry, (order, 1))
 
     # We enqueue our component in the registry config.
     config.action(
@@ -39,30 +39,31 @@ def register_entry(factory, menu, infos, config=None):
               dolmen.menu.IMenuEntry, entry_name))
 
 
-class MenuEntryDecoratorGrokker(martian.GlobalGrokker):
-
+class PreAdapterDecoratorGrokker(martian.GlobalGrokker):
+    martian.priority(1000)
+    
     def grok(self, name, module, module_info, config, **kw):
-        entries = module_info.getAnnotation('grok.menuentries', [])
-        for factory, menu, infos in entries:
-            register_entry(factory, menu, infos, config)
+        callbacks = module_info.getAnnotation('dolmen.menufunctions', [])
+        for register in callbacks:
+            register()
         return True
 
 
-class GlobalMenuEntryGrokker(martian.GlobalGrokker):
+class MenuEntryGrokker(martian.GlobalGrokker):
 
     def grok(self, name, module, module_info, config, **kw):
-        entries = dolmen.menu.global_menuentry.bind().get(module=module)
-        for factory, menu, infos in entries:
-            register_entry(factory, menu, infos, config)
+        callbacks = module_info.getAnnotation('dolmen.menuclasses', [])
+        for register in callbacks:
+            register(register_entry, config)
         return True
 
 
 class ViewletMenuEntriesGrokker(martian.ClassGrokker):
     martian.component(dolmen.menu.Entry)
-    martian.directive(viewlet.context)
-    martian.directive(viewlet.view, default=interface.Interface)
-    martian.directive(viewlet.layer, default=IDefaultBrowserLayer)
-    martian.directive(viewlet.name, get_default=default_view_name)
+    martian.directive(grokcore.view.context)
+    martian.directive(grokcore.view.view, default=interface.Interface)
+    martian.directive(grokcore.view.layer, default=IDefaultBrowserLayer)
+    martian.directive(grokcore.view.name, get_default=default_view_name)
     martian.directive(dolmen.menu.menu, default=None)
 
     def execute(self, factory, config, context, menu, view, layer, name, **kw):
@@ -89,7 +90,6 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
                            view, menu, name),
             callable=component.provideAdapter,
             args=(factory, (context, layer, view, menu),
-                  dolmen.menu.IMenuEntry, name),
-            )
+                  dolmen.menu.IMenuEntry, name))
 
         return True
