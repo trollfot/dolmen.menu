@@ -1,6 +1,14 @@
 Changes
 =======
 
+0.5 (2011-01-31)
+----------------
+
+* ``dolmen.menu`` now works on the latest ``martian``. The treatment
+  of the decorator has been deferred by the use of a module
+  annotation. The registration is now done by a global grokker.
+
+
 0.4 (2010-12-24)
 ----------------
 
