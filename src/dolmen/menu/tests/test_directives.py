@@ -28,7 +28,7 @@
       <dd>
         <ul>
           <li class="entry">
-    	    <a href="http://127.0.0.1/test/a_direct_entry"
+    	    <a href="http://127.0.0.1/test/a_direct_entry?type=1"
                title="My Entry">My Entry</a>
           </li>
           <li class="entry">
@@ -70,6 +70,7 @@ class MyMenuEntry(Entry):
     viewlet.name('a_direct_entry')
     viewlet.title('My Entry')
     menu(NavigationMenu)
+    params = {'type': 1}
 
 
 global_menuentry(AnotherView, NavigationMenu, order=2)

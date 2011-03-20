@@ -35,6 +35,10 @@ def get_entry_values(factory, **extras):
         else:
             value = directive.get(factory)
             values[name] = value
+    # Keep additional extras
+    for name in extras:
+        if name not in EXTRACTABLES:
+            values[name] = extras.get(name)
     return values
 
 

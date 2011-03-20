@@ -21,6 +21,7 @@
   >>> mymenu.viewlets
   [<MenuEntry `entrywithdetails` for menu `mymenu`>,
    <MenuEntry `testentry` for menu `mymenu`>,
+   <MenuEntry `testentrywithparams` for menu `mymenu`>,
    <FactoryGeneratedEntry `an_entry` for menu `mymenu`>]
 
   >>> print mymenu.render()
@@ -34,9 +35,13 @@
              title="Nice view">Nice view</a>
         </li>
         <li class="entry">
-    	  <a alt="" href="http://127.0.0.1/test/testentry"
-    	     title="testentry">testentry</a>
-    	</li>
+          <a alt="" href="http://127.0.0.1/test/testentry"
+             title="testentry">testentry</a>
+        </li>
+        <li class="entry">
+          <a alt="" href="http://127.0.0.1/test/testentrywithparams?type=1"
+             title="testentrywithparams">testentrywithparams</a>
+        </li>
         <li class="entry">
           <a href="http://dolmen-project.org"
              title="Dolmen link">Dolmen link</a>
@@ -56,6 +61,7 @@ Using a user with the appropriate rights, we now have both the items::
   [<MenuEntry `entrywithdetails` for menu `mymenu`>,
    <MenuEntry `protectedentry` for menu `mymenu`>,
    <MenuEntry `testentry` for menu `mymenu`>,
+   <MenuEntry `testentrywithparams` for menu `mymenu`>,
    <FactoryGeneratedEntry `an_entry` for menu `mymenu`>]
 
   >>> endInteraction()
@@ -88,6 +94,18 @@ class MyPerm(security.Permission):
 class TestEntry(view.View):
     def render(self):
         return u"A simple entry"
+
+
+@menuentry(MyMenu, params={'type': 1})
+class TestEntryWithParams(view.View):
+    def render(self):
+        return u"A simple entry with a parameter"
+
+
+@menuentry(MyMenu, available=lambda e: False)
+class TestEntryWithAvailable(view.View):
+    def render(self):
+        return u"A simple entry with a parameter"
 
 
 @menuentry(MyMenu)

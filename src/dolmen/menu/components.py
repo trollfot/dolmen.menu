@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import urllib
 
 import grokcore.view
 import grokcore.viewlet
@@ -12,6 +13,13 @@ from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission
 from zope.security.checker import CheckerPublic
 from zope.traversing.browser.absoluteurl import absoluteURL
+
+
+def isAvailable(viewlet):
+    try:
+        return viewlet.available()
+    except AttributeError:
+        return True
 
 
 class Menu(grokcore.viewlet.ViewletManager):
@@ -50,7 +58,8 @@ class Menu(grokcore.viewlet.ViewletManager):
             if permission == 'zope.Public':
                 # Translate public permission to CheckerPublic
                 permission = CheckerPublic
-            if checkPermission(permission, self.context):
+            if checkPermission(permission, self.context) and \
+                    isAvailable(viewlet):
                 yield name, viewlet
 
     def render(self):
@@ -85,6 +94,7 @@ class Entry(object):
     baseclass()
     implements(IMenuEntryViewlet)
     grokcore.viewlet.context(Interface)
+    params = None
 
     def __init__(self, context, request, view, manager):
         self.view = self.__parent__ = view
@@ -120,7 +130,10 @@ class Entry(object):
 
     @property
     def url(self):
-        return str("%s/%s" % (self.manager.context_url, self.__name__))
+        url = str("%s/%s" % (self.manager.context_url, self.__name__))
+        if self.params:
+            url += '?' + urllib.urlencode(self.params, doseq=True)
+        return url
 
     @property
     def title(self):
