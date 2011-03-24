@@ -10,7 +10,7 @@ from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
 
 def generate_entry(bdict):
-    id = bdict['__view_name__'] = bdict['__name__'] = bdict['name']
+    id = bdict['__view_name__'] = bdict['__name__'] = str(bdict['name'])
     return id, type(id, (dolmen.menu.Entry,), bdict)
 
 
