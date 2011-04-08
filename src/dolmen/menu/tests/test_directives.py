@@ -43,16 +43,16 @@
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location
-from grokcore import view, security, viewlet
-from dolmen.menu import global_menuentry, menu, Menu, Entry
+from dolmen import view, viewlet
+from dolmen import menu
 from zope.interface import Interface
 from zope.site.hooks import getSite
 from zope.publisher.browser import TestRequest 
 
-view.context(Interface)
+menu.context(Interface)
 
-class NavigationMenu(Menu):
-    view.title('My nice menu')
+class NavigationMenu(menu.Menu):
+    menu.title('My nice menu')
 
 
 class GlobalView(view.View):
@@ -65,15 +65,15 @@ class AnotherView(view.View):
         return u"I'm a view and I want to be a menu entry"
 
 
-class MyMenuEntry(Entry):
-    viewlet.order(1)
-    viewlet.name('a_direct_entry')
-    viewlet.title('My Entry')
-    menu(NavigationMenu)
+class MyMenuEntry(menu.Entry):
+    menu.order(1)
+    menu.name('a_direct_entry')
+    menu.title('My Entry')
+    menu.menu(NavigationMenu)
     params = {'type': 1}
 
 
-global_menuentry(AnotherView, NavigationMenu, order=2)
+menu.global_menuentry(AnotherView, NavigationMenu, order=2)
 
 
 def test_suite():

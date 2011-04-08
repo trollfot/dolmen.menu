@@ -36,9 +36,9 @@
 """
 
 from grokcore.component.testing import grok
-#~ from zope.location.location import Location
+from zope.location.location import Location
 from dolmen import view
-from dolmen.menu import menuentry, Menu
+from dolmen import menu
 from zope.interface import Interface
 from zope.site.hooks import getSite
 from cromlech.io.tests import TestRequest
@@ -54,16 +54,16 @@ class GenericView(view.View):
         return u"Nothing to see here"
 
 
-class RootMenu(Menu):
-    view.title('My Root Menu')
-    view.context(Interface)
+class RootMenu(menu.Menu):
+    menu.title('My Root Menu')
+    menu.context(Interface)
 
     def update(self):
         self.setMenuContext(getSite())
-        Menu.update(self)
+        menu.Menu.update(self)
 
 
-@menuentry(RootMenu)
+@menu.menuentry(RootMenu)
 class SomeRootEntry(view.View):
     view.context(IRootFolder)
     

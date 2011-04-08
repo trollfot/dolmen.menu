@@ -32,6 +32,7 @@ tests_require = [
     'zope.container',
     'zope.i18n',
     'zope.principalregistry',
+    'dolmen.webob',
     ]
 
 setup(name = name,

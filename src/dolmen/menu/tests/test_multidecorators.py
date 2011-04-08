@@ -56,21 +56,21 @@
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location
-from grokcore import view, security
-from dolmen.menu import menuentry, Menu, Entry, IMenuEntry, IMenu
+from grokcore import security
+from dolmen import menu, view
 from zope.interface import Interface
 from zope.site.hooks import getSite
 from zope.publisher.browser import TestRequest 
 
-view.context(Interface)
+menu.context(Interface)
 
 
-class MyMenu(Menu):
-    view.title('My nice menu')
+class MyMenu(menu.Menu):
+    menu.title('My nice menu')
 
  
-class AnotherMenu(Menu):
-    view.title('My other menu')
+class AnotherMenu(menu.Menu):
+    menu.title('My other menu')
 
 
 class SomeView(view.View):
@@ -78,8 +78,8 @@ class SomeView(view.View):
         return u"I'm a simple view"
 
 
-@menuentry(MyMenu)
-@menuentry(AnotherMenu, title="Alternate title")
+@menu.menuentry(MyMenu)
+@menu.menuentry(AnotherMenu, title="Alternate title")
 class EntryWithDetails(view.View):
     view.title("An entry with some details")
     def render(self):
