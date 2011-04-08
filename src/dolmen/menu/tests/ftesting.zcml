@@ -13,7 +13,7 @@
   <include package="zope.principalregistry" />
 
   <include package="dolmen.menu" />
-  <include package="grokcore.view" />
+  <include package="dolmen.view" />
 
   <!-- Security -->
   <securityPolicy

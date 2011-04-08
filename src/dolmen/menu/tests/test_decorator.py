@@ -19,9 +19,9 @@
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `entrywithdetails` for menu `mymenu`>,
-   <MenuEntry `testentry` for menu `mymenu`>,
-   <MenuEntry `testentrywithparams` for menu `mymenu`>,
+  [<menu.menuentry `entrywithdetails` for menu `mymenu`>,
+   <menu.menuentry `testentry` for menu `mymenu`>,
+   <menu.menuentry `testentrywithparams` for menu `mymenu`>,
    <FactoryGeneratedEntry `an_entry` for menu `mymenu`>]
 
   >>> print mymenu.render()
@@ -58,31 +58,33 @@ Using a user with the appropriate rights, we now have both the items::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<MenuEntry `entrywithdetails` for menu `mymenu`>,
-   <MenuEntry `protectedentry` for menu `mymenu`>,
-   <MenuEntry `testentry` for menu `mymenu`>,
-   <MenuEntry `testentrywithparams` for menu `mymenu`>,
+  [<menu.menuentry `entrywithdetails` for menu `mymenu`>,
+   <menu.menuentry `protectedentry` for menu `mymenu`>,
+   <menu.menuentry `testentry` for menu `mymenu`>,
+   <menu.menuentry `testentrywithparams` for menu `mymenu`>,
    <FactoryGeneratedEntry `an_entry` for menu `mymenu`>]
 
   >>> endInteraction()
 """
 from grokcore.component.testing import grok
 from zope.location.location import Location
-from grokcore import view, security
-from dolmen.menu import menuentry, Menu, Entry, IMenuEntry, IMenu
+from grokcore import security
+from dolmen import menu
+from dolmen import view
+import dolmen.view.security
 from zope.interface import Interface
 from zope.site.hooks import getSite
-from zope.publisher.browser import TestRequest 
+from cromlech.io.tests import TestRequest 
 
 view.context(Interface)
 
 
-class MyMenu(Menu):
-    view.title('My nice menu')
+class MyMenu(menu.Menu):
+    menu.title('My nice menu')
  
 
 class SomeView(view.View):
-    def render(self):
+    def render(self, *args, **kwargs):
         return u"I'm a simple view"
 
 
@@ -90,33 +92,34 @@ class MyPerm(security.Permission):
     security.name('menu.Display')
 
 
-@menuentry(MyMenu)
+@menu.menuentry(MyMenu)
 class TestEntry(view.View):
     def render(self):
         return u"A simple entry"
 
 
-@menuentry(MyMenu, params={'type': 1})
+@menu.menuentry(MyMenu, params={'type': 1})
 class TestEntryWithParams(view.View):
     def render(self):
         return u"A simple entry with a parameter"
 
 
-@menuentry(MyMenu, available=lambda e: False)
+@menu.menuentry(MyMenu, available=lambda e: False)
 class TestEntryWithAvailable(view.View):
     def render(self):
-        return u"A simple entry with a parameter"
+        return u"A simple unavailble entry"
 
 
-@menuentry(MyMenu)
+@menu.menuentry(MyMenu)
 class ProtectedEntry(view.View):
-    view.require('zope.ManageContent')
+    # FIXME temporary disabled
+    #~ dolmen.view.security.permission('zope.ManageContent')
 
     def render(self):
         return "I'm a restricted view"
 
 
-@menuentry(MyMenu, title='Nice view', description='This is a nice view.')
+@menu.menuentry(MyMenu, title='Nice view', description='This is a nice view.')
 class EntryWithDetails(view.View):
     def render(self):
         return u"A simple entry"
@@ -142,7 +145,7 @@ class MyEntry(object):
             self.url, self.title, self.title)
 
 
-@menuentry(MyMenu)
+@menu.menuentry(MyMenu)
 def manual_entry(context, request, view, menu):
    return MyEntry(menu, 'an_entry', 'Dolmen link',
                   url="http://dolmen-project.org")

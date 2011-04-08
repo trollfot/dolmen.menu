@@ -4,33 +4,31 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '0.6'
+version = '2.0dev'
 readme = open(join('src', 'dolmen', 'menu', "README.txt")).read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'setuptools',
     'grokcore.component',
-    'grokcore.viewlet',
-    'grokcore.view',
-    'megrok.pagetemplate',
+    'grokcore.security',
+    'dolmen.viewlet',
+    'dolmen.view',
+    'dolmen.template',
     'martian',
     'zope.location',
     'zope.interface',
     'zope.security',
     'zope.component',
-    'zope.publisher',
+    'cromlech.browser',
     'zope.schema',
     'zope.security',
-    'zope.traversing',
-    'zope.viewlet',
+    'zope.site',
     ]
 
 tests_require = [
     'zope.securitypolicy',
     'zope.location',
-    'grokcore.security',
-    'zope.site',
     'zope.container',
     'zope.i18n',
     'zope.principalregistry',

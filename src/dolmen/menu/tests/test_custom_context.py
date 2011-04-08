@@ -36,12 +36,12 @@
 """
 
 from grokcore.component.testing import grok
-from zope.location.location import Location
-from grokcore import view
+#~ from zope.location.location import Location
+from dolmen import view
 from dolmen.menu import menuentry, Menu
 from zope.interface import Interface
 from zope.site.hooks import getSite
-from zope.publisher.browser import TestRequest
+from cromlech.io.tests import TestRequest
 from zope.site.interfaces import IRootFolder
 
 view.context(Interface)
@@ -50,7 +50,7 @@ view.context(Interface)
 class GenericView(view.View):
     view.context(Interface)
 
-    def render(self):
+    def render(self, *args, **kwargs):
         return u"Nothing to see here"
 
 

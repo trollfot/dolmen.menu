@@ -20,10 +20,11 @@ Components
 ``dolmen.menu`` provides two components:
 
 * Menu : the menu implementation is based on the zope "content
-  provider" notion and is using the ``grokcore.viewlet`` package.
+  provider" notion and is using the ``dolmen.viewlet`` package.
+  It is a specific ViewletManager.
 
-* Entry: a menu item is called an entry. It's a multi adapter that is
-  registered for a Menu component.
+* Entry: a menu item is called an entry. It's a viewlet, and as such, a multi
+  adapter registered for a Menu component.
 
 
 Examples
@@ -54,7 +55,7 @@ registration ways.
 class decorator
 ---------------
 
-A class decorator allows you to decorate any class, in order to
+A class decorator allows you to decorate any View class, in order to
 register it as a menu entry::
 
   >>> import grokcore.view

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from zope import schema
+from zope import schema # XXX Keep it ? (inpact setup.py if not)
 from zope.interface import Interface
 from zope.location import ILocation
-from zope.viewlet.interfaces import IViewletManager, IViewlet
+from dolmen.viewlet import IViewletManager, IViewlet
 from zope.security.zcml import Permission
 
 
