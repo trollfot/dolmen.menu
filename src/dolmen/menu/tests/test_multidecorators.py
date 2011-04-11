@@ -60,7 +60,7 @@ from grokcore import security
 from dolmen import menu, view
 from zope.interface import Interface
 from zope.site.hooks import getSite
-from zope.publisher.browser import TestRequest 
+from cromlech.io.testing import TestRequest 
 
 menu.context(Interface)
 

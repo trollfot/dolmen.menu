@@ -11,7 +11,8 @@
 
   <include package="zope.security" />
   <include package="zope.principalregistry" />
-
+  
+  <include package="dolmen.location" />
   <include package="dolmen.menu" />
   <include package="dolmen.view" />
 

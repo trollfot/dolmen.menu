@@ -2,13 +2,16 @@
 import urllib
 
 import dolmen.viewlet
+from dolmen.viewlet.components import query_components
 from grokcore.component import title, description, context
 
 from grokcore.component import baseclass
+from grokcore.component.util import sort_components
 import grokcore.security
 from cromlech.browser import ITemplate
 from cromlech.io import IRequest
 from dolmen.template import TALTemplate
+from dolmen.location import absolute_url
 from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface, implementer
 from zope.component import adapter
@@ -19,10 +22,9 @@ from zope.security.checker import CheckerPublic
 
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 
-
 def isAvailable(viewlet):
     try:
-        return viewlet.available()
+        return viewlet.available
     except AttributeError:
         return True
 
@@ -81,6 +83,13 @@ class Menu(dolmen.viewlet.ViewletManager):
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
         return template()
+        
+    def get_menu_entries(self):
+        # Find all content providers for the region
+        viewlets = getAdapters(
+            (self.getMenuContext(), self.request, self.view, self),
+            IMenuEntry)
+        return self.filter(viewlets)
 
     def update(self):
         self.__updated = True
@@ -90,19 +99,14 @@ class Menu(dolmen.viewlet.ViewletManager):
         menu_context = self.getMenuContext()
 
         # Get the MenuContext and calculate its url
-        self.context_url = "http://localhost/" # FIXME !!! IURLResolver(menu_context, self.request)
+        self.context_url = absolute_url(menu_context, self.request)
         
-        # Find all content providers for the region
-        viewlets = getAdapters(
-            (menu_context, self.request, self.__parent__, self),
-            IMenuEntry)
-
-        viewlets = self.filter(viewlets)
-        self.viewlets = [viewlet for name, viewlet in self.sort(viewlets)]
+        viewlets = self.get_menu_entries()
+        self.viewlets = sort_components([entry for name, entry in viewlets])
         self._updateViewlets()
 
 
-class Entry(object):
+class Entry(dolmen.viewlet.Viewlet):
     """The menu entry viewlet
 
     template may be provided as an attribute or will be search as an
@@ -121,7 +125,7 @@ class Entry(object):
         self.__name__ = self.__view_name__
 
     def __repr__(self):
-        return  "<MenuEntry `%s` for menu `%s`>" % (
+        return  "<menu.menuentry `%s` for menu `%s`>" % (
             self.__view_name__, self.manager.__name__)
 
     def default_namespace(self):

@@ -47,7 +47,7 @@ from dolmen import view, viewlet
 from dolmen import menu
 from zope.interface import Interface
 from zope.site.hooks import getSite
-from zope.publisher.browser import TestRequest 
+from cromlech.io.testing import TestRequest
 
 menu.context(Interface)
 

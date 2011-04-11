@@ -12,6 +12,7 @@ install_requires = [
     'setuptools',
     'grokcore.component',
     'grokcore.security',
+    'dolmen.location',
     'dolmen.viewlet',
     'dolmen.view',
     'dolmen.template',
@@ -32,7 +33,7 @@ tests_require = [
     'zope.container',
     'zope.i18n',
     'zope.principalregistry',
-    'dolmen.webob',
+    'cromlech.webob',
     ]
 
 setup(name = name,

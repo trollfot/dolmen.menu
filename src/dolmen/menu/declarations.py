@@ -70,7 +70,7 @@ def function_menu_entry(frame, entry, menu, infos):
 
 
 def class_menu_entry(frame, entry, menu, infos):
-    """return tre registrator of a class or a method as a menu entry"""
+    """return the registrator of a class or a method as a menu entry"""
     def register(register_method, config):
         register_method(entry, menu, infos, config)
     return register

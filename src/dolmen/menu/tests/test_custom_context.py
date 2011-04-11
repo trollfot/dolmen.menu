@@ -41,7 +41,7 @@ from dolmen import view
 from dolmen import menu
 from zope.interface import Interface
 from zope.site.hooks import getSite
-from cromlech.io.tests import TestRequest
+from cromlech.io.testing import TestRequest
 from zope.site.interfaces import IRootFolder
 
 view.context(Interface)

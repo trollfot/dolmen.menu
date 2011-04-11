@@ -3,9 +3,11 @@
 import zope.component
 from zope.component.interfaces import IComponentLookup
 from zope.component.testlayer import ZCMLFileLayer
-from zope.interface import Interface
+from zope.interface import Interface, directlyProvides
 from zope.site.folder import rootFolder
 from zope.site.site import LocalSiteManager, SiteManagerAdapter
+
+from cromlech.io.interfaces import IPublicationRoot
 
 
 def siteSetUp(test):
@@ -20,6 +22,7 @@ def siteSetUp(test):
     # Set up site
     site = rootFolder()
     site.setSiteManager(LocalSiteManager(site))
+    directlyProvides(site, IPublicationRoot)
     zope.component.hooks.setSite(site)
 
     return site
