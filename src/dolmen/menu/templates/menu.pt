@@ -1,13 +1,13 @@
-<dl tal:condition="viewletmanager/viewlets"
-    tal:attributes="id viewletmanager/id;
-		    class viewletmanager/menu_class;">
-  <dt tal:content="viewletmanager/title"
-      tal:condition="viewletmanager/title" />
+<dl tal:condition="manager.viewlets"
+    tal:attributes="id manager.id();
+		    class manager.menu_class;">
+  <dt tal:content="manager.title"
+      tal:condition="manager.title" />
   <dd>
     <ul>
-      <li tal:attributes="class viewletmanager/entry_class"
-	  tal:repeat="action viewletmanager/viewlets">
-	<tal:entry content="structure action/render" />
+      <li tal:attributes="class manager.entry_class"
+	  tal:repeat="action manager.viewlets">
+	<tal:entry content="structure action.render()" />
       </li>
     </ul>
   </dd>

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import urllib
+import os
+import sys
 
 import dolmen.viewlet
 from dolmen.viewlet.components import query_components
 from grokcore.component import title, description, context
 
-from grokcore.component import baseclass
+from grokcore.component import baseclass, adapter, implementer
 from grokcore.component.util import sort_components
 import grokcore.security
 from cromlech.browser import ITemplate
@@ -13,8 +15,7 @@ from cromlech.io import IRequest
 from dolmen.template import TALTemplate
 from dolmen.location import absolute_url
 from zope.component import getAdapters, getMultiAdapter
-from zope.interface import implements, Interface, implementer
-from zope.component import adapter
+from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission
 from zope.security.checker import CheckerPublic
@@ -82,10 +83,11 @@ class Menu(dolmen.viewlet.ViewletManager):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
-        return template()
+        return template.render(self)
         
     def get_menu_entries(self):
         # Find all content providers for the region
+        import pdb;pdb.set_trace()
         viewlets = getAdapters(
             (self.getMenuContext(), self.request, self.view, self),
             IMenuEntry)
@@ -192,15 +194,17 @@ class Entry(dolmen.viewlet.Viewlet):
             template = getMultiAdapter((self, self.request), ITemplate)
         return template()
 
+module = sys.modules[__name__]
+_prefix = os.path.dirname(module.__file__)
 
-@adapter(IMenu, IRequest)
+@adapter(IMenu, Interface)
 @implementer(ITemplate)
 def menu_template(context, request):
     """default template for the menu"""
-    return TALTemplate(filename="templates/menu.pt")
+    return TALTemplate(filename=os.path.join(_prefix, "templates/menu.pt"))
 
-@adapter(IMenuEntry, IRequest)
+@adapter(IMenuEntry, Interface)
 @implementer(ITemplate)
-def entry_template(TALTemplate):
+def entry_template(context, request):
     """default template for a menu entry"""
-    return TALTemplate(filename="templates/entry.pt")
+    return TALTemplate(filename=os.path.join(_prefix, "templates/entry.pt"))

@@ -1,19 +1,31 @@
 """
+
+Groking ::
+
   >>> grok(__name__)
-  >>> root = getSite()
-  
-  >>> context = root['test'] = Location()
+
+A root of publication to compute url ::  
+
+  >>> root = Location()
+  >>> directlyProvides(root, IPublicationRoot)
+  >>> context = Location()
+  >>> context.__parent__, context.__name__ = root, 'test'
   >>> request = TestRequest()
+
+A basic view ::
 
   >>> someview = SomeView(context, request)
   >>> someview
   <dolmen.menu.tests.test_decorator.SomeView object at ...>
 
+Using the menu ::
+  
   >>> mymenu = MyMenu(context, request, someview)
+
+Use it ::
 
   >>> from zope.security.testing import Principal, Participation
   >>> from zope.security.management import newInteraction, endInteraction
-
   >>> participation = Participation(Principal('zope.anybody'))
   >>> newInteraction(participation)
 
@@ -50,9 +62,10 @@
     </dd>
   </dl>
 
+  >>> endInteraction()
+
 Using a user with the appropriate rights, we now have both the items::
 
-  >>> endInteraction()
   >>> participation = Participation(Principal('zope.user'))
   >>> newInteraction(participation)
 
@@ -69,14 +82,16 @@ FIXME : Removed for now
 
   >>> endInteraction()
 """
-from grokcore.component.testing import grok
+from dolmen.menu.testing import grok
+from zope.interface import directlyProvides
+from cromlech.io.interfaces import IPublicationRoot
 from zope.location.location import Location
 from grokcore import security
 from dolmen import menu
 from dolmen import view
 import dolmen.view.security
 from zope.interface import Interface
-from zope.site.hooks import getSite
+#~ from zope.site.hooks import getSite
 from cromlech.io.testing import TestRequest
 
 view.context(Interface)
@@ -155,12 +170,12 @@ def manual_entry(context, request, view, menu):
 
 def test_suite():
     import unittest, doctest
-    from dolmen.menu import tests
+    #~ from dolmen.menu import tests
 
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(
-        setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
+        #~ setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
         optionflags=(doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS))
-    mytest.layer = tests.DolmenMenuLayer(tests)
+    #~ mytest.layer = tests.DolmenMenuLayer(tests)
     suite.addTest(mytest)
     return suite
