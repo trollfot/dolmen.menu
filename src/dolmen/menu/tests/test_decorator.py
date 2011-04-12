@@ -1,10 +1,10 @@
 """
 
-Groking ::
+Groking::
 
   >>> grok(__name__)
 
-A root of publication to compute url ::  
+A root of publication to compute url::
 
   >>> root = Location()
   >>> directlyProvides(root, IPublicationRoot)
@@ -19,7 +19,7 @@ A basic view ::
   <dolmen.menu.tests.test_decorator.SomeView object at ...>
 
 Using the menu ::
-  
+
   >>> mymenu = MyMenu(context, request, someview)
 
 Use it ::
@@ -43,15 +43,15 @@ Use it ::
       <ul>
         <li class="entry">
           <a alt="This is a nice view."
-             href="http://127.0.0.1/test/entrywithdetails"
+             href="http://localhost/test/entrywithdetails"
              title="Nice view">Nice view</a>
         </li>
         <li class="entry">
-          <a alt="" href="http://127.0.0.1/test/testentry"
+          <a alt="" href="http://localhost/test/testentry"
              title="testentry">testentry</a>
         </li>
         <li class="entry">
-          <a alt="" href="http://127.0.0.1/test/testentrywithparams?type=1"
+          <a alt="" href="http://localhost/test/testentrywithparams?type=1"
              title="testentrywithparams">testentrywithparams</a>
         </li>
         <li class="entry">
@@ -70,7 +70,7 @@ Using a user with the appropriate rights, we now have both the items::
   >>> newInteraction(participation)
 
   >>> mymenu.update()
-  
+
 FIXME : Removed for now
 
   xxx mymenu.viewlets
@@ -83,25 +83,35 @@ FIXME : Removed for now
   >>> endInteraction()
 """
 from dolmen.menu.testing import grok
-from zope.interface import directlyProvides
+from zope.interface import directlyProvides, implements
+from cromlech.browser import IView
 from cromlech.io.interfaces import IPublicationRoot
 from zope.location.location import Location
 from grokcore import security
 from dolmen import menu
-from dolmen import view
-import dolmen.view.security
 from zope.interface import Interface
-#~ from zope.site.hooks import getSite
 from cromlech.io.testing import TestRequest
 
-view.context(Interface)
+menu.context(Interface)
+
+Public = 'zope.Public'
 
 
 class MyMenu(menu.Menu):
     menu.title('My nice menu')
- 
 
-class SomeView(view.View):
+
+class SomeView(object):
+    implements(IView)
+    __name__ = 'someview'
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def update(self, *args, **kwargs):
+        pass
+
     def render(self, *args, **kwargs):
         return u"I'm a simple view"
 
@@ -110,34 +120,35 @@ class MyPerm(security.Permission):
     security.name('menu.Display')
 
 
-@menu.menuentry(MyMenu)
-class TestEntry(view.View):
+@menu.menuentry(MyMenu, permission=Public)
+class TestEntry(SomeView):
     def render(self):
         return u"A simple entry"
 
 
-@menu.menuentry(MyMenu, params={'type': 1})
-class TestEntryWithParams(view.View):
+@menu.menuentry(MyMenu, params={'type': 1}, permission=Public)
+class TestEntryWithParams(SomeView):
     def render(self):
         return u"A simple entry with a parameter"
 
 
-@menu.menuentry(MyMenu, available=False)
-class TestEntryWithAvailable(view.View):
+@menu.menuentry(MyMenu, available=False, permission=Public)
+class TestEntryWithAvailable(SomeView):
     def render(self):
         return u"A simple unavailble entry"
 
 # FIXME temporarly disabled
 #~ @menu.menuentry(MyMenu)
-#~ class ProtectedEntry(view.View):
+#~ class ProtectedEntry(SomeView):
     #~ dolmen.view.security.permission('zope.ManageContent')
-#~ 
+#~
     #~ def render(self):
         #~ return "I'm a restricted view"
 
 
-@menu.menuentry(MyMenu, title='Nice view', description='This is a nice view.')
-class EntryWithDetails(view.View):
+@menu.menuentry(MyMenu, title='Nice view', description='This is a nice view.',
+                permission=Public)
+class EntryWithDetails(SomeView):
     def render(self):
         return u"A simple entry"
 
@@ -145,7 +156,7 @@ class EntryWithDetails(view.View):
 class MyEntry(object):
     """A very basic entry.
     """
-    def __init__(self, menu, id, title, url, desc=u"", perm='zope.View'):
+    def __init__(self, menu, id, title, url, desc=u"", perm=Public):
         self.__name__ = id
         self.permission = perm
         self.title = title
@@ -155,7 +166,7 @@ class MyEntry(object):
 
     def __repr__(self):
         return "<FactoryGeneratedEntry `%s` for menu `%s`>" % (
-            self.__name__, self.menu.__name__)
+            self.__name__, self.menu.__class__.__name__)
 
     def render(self):
         return """<a href="%s" title="%s">%s</a>""" % (
@@ -164,18 +175,17 @@ class MyEntry(object):
 
 @menu.menuentry(MyMenu)
 def manual_entry(context, request, view, menu):
-   return MyEntry(menu, 'an_entry', 'Dolmen link',
-                  url="http://dolmen-project.org")
+    return MyEntry(menu, 'an_entry', 'Dolmen link',
+                   url="http://dolmen-project.org")
 
 
 def test_suite():
-    import unittest, doctest
-    #~ from dolmen.menu import tests
+    import unittest
+    import doctest
+    from dolmen.menu import tests
 
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(
-        #~ setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
-        optionflags=(doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS))
-    #~ mytest.layer = tests.DolmenMenuLayer(tests)
+        optionflags=(doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS))
     suite.addTest(mytest)
     return suite

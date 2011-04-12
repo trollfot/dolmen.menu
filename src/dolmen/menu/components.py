@@ -23,6 +23,7 @@ from zope.security.checker import CheckerPublic
 
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 
+
 def isAvailable(viewlet):
     try:
         return viewlet.available
@@ -49,7 +50,7 @@ class Menu(dolmen.viewlet.ViewletManager):
     @property
     def id(self):
         """id for eg. html id attribute"""
-        return self.__name__.replace('.', '-')
+        return (self.__class__.__name__ or '').replace('.', '-')
 
     def setMenuContext(self, item):
         self.menu_context = item
@@ -84,25 +85,25 @@ class Menu(dolmen.viewlet.ViewletManager):
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
         return template.render(self)
-        
+
     def get_menu_entries(self):
         # Find all content providers for the region
-        import pdb;pdb.set_trace()
         viewlets = getAdapters(
             (self.getMenuContext(), self.request, self.view, self),
             IMenuEntry)
-        return self.filter(viewlets)
+        for item in self.filter(viewlets):
+            yield item
 
     def update(self):
         self.__updated = True
-        self.title = title.bind(default=self.__name__).get(self) # Alex : why not an interface attribute ?
+        self.title = title.bind(default=self.__name__).get(self)
 
         # We get the real context
         menu_context = self.getMenuContext()
 
         # Get the MenuContext and calculate its url
         self.context_url = absolute_url(menu_context, self.request)
-        
+
         viewlets = self.get_menu_entries()
         self.viewlets = sort_components([entry for name, entry in viewlets])
         self._updateViewlets()
@@ -128,9 +129,9 @@ class Entry(dolmen.viewlet.Viewlet):
 
     def __repr__(self):
         return  "<menu.menuentry `%s` for menu `%s`>" % (
-            self.__view_name__, self.manager.__name__)
+            self.__view_name__, self.manager.__class__.__name__)
 
-    def default_namespace(self):
+    def namespace(self):
         """Objects that will be available in template"""
         namespace = {}
         namespace['context'] = self.context
@@ -139,9 +140,6 @@ class Entry(dolmen.viewlet.Viewlet):
         namespace['entry'] = self
         namespace['menu'] = self.manager
         return namespace
-
-    def namespace(self):
-        return {}
 
     def update(self):
         pass
@@ -192,16 +190,18 @@ class Entry(dolmen.viewlet.Viewlet):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
-        return template()
+        return template.render(self)
 
 module = sys.modules[__name__]
 _prefix = os.path.dirname(module.__file__)
+
 
 @adapter(IMenu, Interface)
 @implementer(ITemplate)
 def menu_template(context, request):
     """default template for the menu"""
     return TALTemplate(filename=os.path.join(_prefix, "templates/menu.pt"))
+
 
 @adapter(IMenuEntry, Interface)
 @implementer(ITemplate)

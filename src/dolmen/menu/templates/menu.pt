@@ -1,5 +1,5 @@
 <dl tal:condition="manager.viewlets"
-    tal:attributes="id manager.id();
+    tal:attributes="id manager.id;
 		    class manager.menu_class;">
   <dt tal:content="manager.title"
       tal:condition="manager.title" />

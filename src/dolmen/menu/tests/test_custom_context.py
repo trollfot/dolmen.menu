@@ -1,8 +1,14 @@
 """
-  >>> grok(__name__)
-  >>> root = getSite()
+Groking ::
 
-  >>> context = root['test'] = Location()
+  >>> grok(__name__)
+
+A root of publication to compute url ::
+
+  >>> root = Location()
+  >>> directlyProvides(root, IPublicationRoot)
+  >>> context = Location()
+  >>> context.__parent__, context.__name__ = root, 'test'
   >>> request = TestRequest()
 
   >>> someview = GenericView(context, request)
@@ -16,7 +22,7 @@
 
   >>> rootmenu.update()
   >>> rootmenu.viewlets
-  [<MenuEntry `somerootentry` for menu `rootmenu`>]
+  [<menu.menuentry `somerootentry` for menu `rootmenu`>]
 
   >>> print rootmenu.render()
   <dl id="rootmenu" class="menu">
@@ -24,7 +30,7 @@
     <dd>
       <ul>
         <li class="entry">
-          <a alt="" href="http://127.0.0.1/somerootentry"
+          <a alt="" href="http://localhost/somerootentry"
                     title="somerootentry">somerootentry</a>
         </li>
       </ul>
@@ -35,23 +41,29 @@
 
 """
 
-from grokcore.component.testing import grok
+from dolmen.menu.testing import grok
 from zope.location.location import Location
-from dolmen import view
+from cromlech.browser import IView
+from cromlech.io.interfaces import IPublicationRoot
 from dolmen import menu
-from zope.interface import Interface
-from zope.site.hooks import getSite
+from zope.interface import Interface, directlyProvides, implements
+from grokcore.security import require
 from cromlech.io.testing import TestRequest
-from zope.site.interfaces import IRootFolder
-
-view.context(Interface)
 
 
-class GenericView(view.View):
-    view.context(Interface)
+class GenericView(object):
+    implements(IView)
+    __name__ = 'generic_view'
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def update(self, *args, **kwargs):
+        pass
 
     def render(self, *args, **kwargs):
-        return u"Nothing to see here"
+        return u"I'm a simple view"
 
 
 class RootMenu(menu.Menu):
@@ -59,26 +71,26 @@ class RootMenu(menu.Menu):
     menu.context(Interface)
 
     def update(self):
-        self.setMenuContext(getSite())
+        self.setMenuContext(self.context.__parent__)
         menu.Menu.update(self)
 
 
 @menu.menuentry(RootMenu)
-class SomeRootEntry(view.View):
-    view.context(IRootFolder)
-    
+class SomeRootEntry(GenericView):
+    menu.context(IPublicationRoot)
+    require('zope.Public')
+
     def render(self):
         return u"A Root entry"
 
 
 def test_suite():
-    import unittest, doctest
+    import unittest
+    import doctest
     from dolmen.menu import tests
 
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(
-        setUp=tests.siteSetUp, tearDown=tests.siteTearDown,
-        optionflags=(doctest.NORMALIZE_WHITESPACE|doctest.ELLIPSIS))
-    mytest.layer = tests.DolmenMenuLayer(tests)
+        optionflags=(doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS))
     suite.addTest(mytest)
     return suite
