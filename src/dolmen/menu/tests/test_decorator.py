@@ -66,14 +66,13 @@ Use it ::
 
 Using a user with the appropriate rights, we now have both the items::
 
-  >>> participation = Participation(Principal('zope.user'))
+  >>> from zope.security.management import system_user
+  >>> participation = Participation(system_user)
   >>> newInteraction(participation)
 
   >>> mymenu.update()
 
-FIXME : Removed for now
-
-  xxx mymenu.viewlets
+  >>> mymenu.viewlets
   [<menu.menuentry `entrywithdetails` for menu `mymenu`>,
    <menu.menuentry `protectedentry` for menu `mymenu`>,
    <menu.menuentry `testentry` for menu `mymenu`>,
@@ -137,13 +136,13 @@ class TestEntryWithAvailable(SomeView):
     def render(self):
         return u"A simple unavailble entry"
 
-# FIXME temporarly disabled
-#~ @menu.menuentry(MyMenu)
-#~ class ProtectedEntry(SomeView):
-    #~ dolmen.view.security.permission('zope.ManageContent')
-#~
-    #~ def render(self):
-        #~ return "I'm a restricted view"
+
+@menu.menuentry(MyMenu)
+class ProtectedEntry(SomeView):
+    security.require('zope.ManageContent')
+
+    def render(self):
+        return "I'm a restricted view"
 
 
 @menu.menuentry(MyMenu, title='Nice view', description='This is a nice view.',
