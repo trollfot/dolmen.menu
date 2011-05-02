@@ -24,7 +24,6 @@ install_requires = [
     'cromlech.browser',
     'zope.schema',
     'zope.security',
-    'zope.site',
     ]
 
 tests_require = [
