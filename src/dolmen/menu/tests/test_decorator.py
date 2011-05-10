@@ -2,14 +2,21 @@
 
 Groking::
 
+  >>> from dolmen.menu.testing import grok
   >>> grok(__name__)
 
 A root of publication to compute url::
+
+  >>> from zope.location.location import Location
+  >>> from zope.interface import directlyProvides
+  >>> from cromlech.io.interfaces import IPublicationRoot
 
   >>> root = Location()
   >>> directlyProvides(root, IPublicationRoot)
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
+
+  >>> from cromlech.io.testing import TestRequest
   >>> request = TestRequest()
 
 A basic view ::
@@ -31,10 +38,10 @@ Use it ::
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<menu.menuentry `entrywithdetails` for menu `mymenu`>,
-   <menu.menuentry `testentry` for menu `mymenu`>,
-   <menu.menuentry `testentrywithparams` for menu `mymenu`>,
-   <FactoryGeneratedEntry `an_entry` for menu `mymenu`>]
+  [<menu.menuentry `entrywithdetails` for menu `MyMenu`>,
+   <menu.menuentry `testentry` for menu `MyMenu`>,
+   <menu.menuentry `testentrywithparams` for menu `MyMenu`>,
+   <FactoryGeneratedEntry `an_entry` for menu `MyMenu`>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -73,23 +80,21 @@ Using a user with the appropriate rights, we now have both the items::
   >>> mymenu.update()
 
   >>> mymenu.viewlets
-  [<menu.menuentry `entrywithdetails` for menu `mymenu`>,
-   <menu.menuentry `protectedentry` for menu `mymenu`>,
-   <menu.menuentry `testentry` for menu `mymenu`>,
-   <menu.menuentry `testentrywithparams` for menu `mymenu`>,
-   <FactoryGeneratedEntry `an_entry` for menu `mymenu`>]
+  [<menu.menuentry `entrywithdetails` for menu `MyMenu`>,
+   <menu.menuentry `protectedentry` for menu `MyMenu`>,
+   <menu.menuentry `testentry` for menu `MyMenu`>,
+   <menu.menuentry `testentrywithparams` for menu `MyMenu`>,
+   <FactoryGeneratedEntry `an_entry` for menu `MyMenu`>]
 
   >>> endInteraction()
 """
-from dolmen.menu.testing import grok
-from zope.interface import directlyProvides, implements
+
+from zope.interface import implements
 from cromlech.browser import IView
-from cromlech.io.interfaces import IPublicationRoot
-from zope.location.location import Location
 from grokcore import security
 from dolmen import menu
 from zope.interface import Interface
-from cromlech.io.testing import TestRequest
+
 
 menu.context(Interface)
 
@@ -102,7 +107,7 @@ class MyMenu(menu.Menu):
 
 class SomeView(object):
     implements(IView)
-    __name__ = 'someview'
+    __component_name__ = 'someview'
 
     def __init__(self, context, request):
         self.context = context
@@ -181,7 +186,6 @@ def manual_entry(context, request, view, menu):
 def test_suite():
     import unittest
     import doctest
-    from dolmen.menu import tests
 
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(

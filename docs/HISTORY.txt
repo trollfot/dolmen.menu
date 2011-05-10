@@ -1,13 +1,19 @@
 Changes
 =======
 
-0.6 (unreleased)
-----------------
+2.0a1 (2011-05-10)
+------------------
+
+* We now use the `Cromlech` framework.
+
+* The naming of the component, set during the grokking, moved from
+  ``__name__`` to ``__component_name__``.
 
 * The menu_entry decorator now supports two new parameters:
 
   - ``available``, a callable that take one parameter, the menu entry
   - ``params``, a dict to add parameters to the generated url.
+
 
 0.5 (2011-01-31)
 ----------------

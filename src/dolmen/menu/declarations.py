@@ -12,13 +12,12 @@ from martian.util import frame_is_module
 # TODO : do we want permission handling in a separate place not to enforce
 # use of grokcore.security ?
 import grokcore.security
-from cromlech.io import IRequest
-from dolmen.view.meta import default_view_name
-from dolmen.menu.interfaces import IMenu, IMenuEntry
-
 from grokcore.component import order, title, name, description, context
+
+from dolmen.menu.interfaces import IMenu, IMenuEntry
+from cromlech.io import IRequest
 from cromlech.io.directives import request
-from cromlech.browser.directives import view
+from cromlech.browser.directives import view, default_view_name
 
 
 EXTRACTABLES = {

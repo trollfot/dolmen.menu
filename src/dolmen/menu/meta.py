@@ -3,14 +3,14 @@
 import martian
 import dolmen.menu
 
-from dolmen.view.meta import default_view_name
-from zope import component, interface
+from cromlech.browser.directives import default_view_name
 from cromlech.io import IRequest
+from zope import component, interface
 
 
 def generate_entry(bdict):
     """instanciat an Entry from parameters"""
-    id = bdict['__view_name__'] = bdict['__name__'] = str(bdict['name'])
+    id = bdict['__component_name__'] = bdict['__name__'] = str(bdict['name'])
     entry = type(id, (dolmen.menu.Entry,), bdict)
     entry.__name__ = id
     return id, entry
@@ -103,7 +103,7 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
             if not dolmen.menu.IMenu.implementedBy(menu):
                 raise ValueError("Invalid menu type")
 
-        factory.__name__ = factory.__view_name__ = name
+        factory.__name__ = factory.__component_name__ = name
         interface.verify.verifyClass(dolmen.menu.IMenuEntry, factory)
         # We enqueue our component in the registry config.
         config.action(

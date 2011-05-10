@@ -2,14 +2,21 @@
 
 Groking::
 
+  >>> from dolmen.menu.testing import grok
   >>> grok(__name__)
 
 A root of publication to compute url::
+
+  >>> from zope.location.location import Location
+  >>> from zope.interface import directlyProvides
+  >>> from cromlech.io.interfaces import IPublicationRoot
 
   >>> root = Location()
   >>> directlyProvides(root, IPublicationRoot)
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
+
+  >>> from cromlech.io.testing import TestRequest
   >>> request = TestRequest()
 
 A basic view ::
@@ -23,19 +30,13 @@ testing menu ::
   >>> mymenu = MyMenu(context, request, someview)
   >>> anothermenu = AnotherMenu(context, request, someview)
 
-  >>> from zope.security.testing import Principal, Participation
-  >>> from zope.security.management import newInteraction, endInteraction
-
-  >>> participation = Participation(Principal('zope.anybody'))
-  >>> newInteraction(participation)
-
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<menu.menuentry `entrywithdetails` for menu `mymenu`>]
+  [<menu.menuentry `entrywithdetails` for menu `MyMenu`>]
 
   >>> anothermenu.update()
   >>> anothermenu.viewlets
-  [<menu.menuentry `entrywithdetails` for menu `anothermenu`>]
+  [<menu.menuentry `entrywithdetails` for menu `AnotherMenu`>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -63,17 +64,10 @@ testing menu ::
     </dd>
   </dl>
 
-  >>> endInteraction()
 """
-from dolmen.menu.testing import grok
-from zope.interface import directlyProvides, implements
-from cromlech.browser import IView
-from cromlech.io.interfaces import IPublicationRoot
-from zope.location.location import Location
-from grokcore import security
+
 from dolmen import menu
 from zope.interface import Interface
-from cromlech.io.testing import TestRequest
 
 menu.context(Interface)  # everywhere !
 
@@ -87,8 +81,7 @@ class AnotherMenu(menu.Menu):
 
 
 class SomeView(object):
-    implements(IView)
-    __name__ = 'someview'
+    __component_name__ = 'someview'
 
     def __init__(self, context, request):
         self.context = context
@@ -113,7 +106,6 @@ class EntryWithDetails(SomeView):
 def test_suite():
     import unittest
     import doctest
-    from dolmen.menu import tests
 
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(

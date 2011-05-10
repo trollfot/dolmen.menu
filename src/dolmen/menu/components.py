@@ -1,27 +1,24 @@
 # -*- coding: utf-8 -*-
 import urllib
 import os
-import sys
 
-import dolmen.viewlet
-from dolmen.viewlet.components import query_components
+import grokcore.security
 from grokcore.component import title, description, context
-
 from grokcore.component import baseclass, adapter, implementer
 from grokcore.component.util import sort_components
-import grokcore.security
 from cromlech.browser import ITemplate
-from cromlech.io import IRequest
-from dolmen.template import TALTemplate
+
+import dolmen.viewlet
 from dolmen.location import absolute_url
+from dolmen.template import TALTemplate
+
+from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
+
 from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
 from zope.security import checkPermission
 from zope.security.checker import CheckerPublic
-
-
-from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 
 
 def isAvailable(viewlet):
@@ -49,8 +46,12 @@ class Menu(dolmen.viewlet.ViewletManager):
 
     @property
     def id(self):
-        """id for eg. html id attribute"""
-        return (self.__class__.__name__ or '').replace('.', '-')
+        """id for eg. html id attribute.
+        """
+        component_name = getattr(self, '__component_name__', None)
+        if component_name is None:
+            return self.__class__.__name__.lower()
+        return component_name
 
     def setMenuContext(self, item):
         self.menu_context = item
@@ -96,7 +97,7 @@ class Menu(dolmen.viewlet.ViewletManager):
 
     def update(self):
         self.__updated = True
-        self.title = title.bind(default=self.__name__).get(self)
+        self.title = title.bind(default=self.__component_name__).get(self)
 
         # We get the real context
         menu_context = self.getMenuContext()
@@ -125,11 +126,10 @@ class Entry(dolmen.viewlet.Viewlet):
         self.context = context
         self.request = request
         self.manager = manager
-        self.__name__ = self.__view_name__
 
     def __repr__(self):
         return  "<menu.menuentry `%s` for menu `%s`>" % (
-            self.__view_name__, self.manager.__class__.__name__)
+            self.__component_name__, self.manager.__class__.__name__)
 
     def namespace(self):
         """Objects that will be available in template"""
@@ -153,7 +153,7 @@ class Entry(dolmen.viewlet.Viewlet):
         You may override this if you do not use default strategy of view name
         matching last part of target url
         """
-        if self.__name__ == self.view.__name__:
+        if self.__component_name__ == self.view.__component_name__:
             return True
         return False
 
@@ -166,14 +166,14 @@ class Entry(dolmen.viewlet.Viewlet):
 
         You may override for a different strategy
         """
-        url = str("%s/%s" % (self.manager.context_url, self.__name__))
+        url = str("%s/%s" % (self.manager.context_url, self.__component_name__))
         if self.params:
             url += '?' + urllib.urlencode(self.params, doseq=True)
         return url
 
     @property
     def title(self):
-        return title.bind(default=self.__name__).get(self)
+        return title.bind(default=self.__component_name__).get(self)
 
     @property
     def permission(self):
@@ -192,8 +192,8 @@ class Entry(dolmen.viewlet.Viewlet):
             template = getMultiAdapter((self, self.request), ITemplate)
         return template.render(self)
 
-module = sys.modules[__name__]
-_prefix = os.path.dirname(module.__file__)
+
+_prefix = os.path.dirname(__file__)
 
 
 @adapter(IMenu, Interface)

@@ -1,14 +1,21 @@
 """
 Groking ::
 
+  >>> from dolmen.menu.testing import grok
   >>> grok(__name__)
 
 A root of publication to compute url::
 
+  >>> from zope.location.location import Location
+  >>> from cromlech.io.interfaces import IPublicationRoot
+  >>> from zope.interface import directlyProvides
+  
   >>> root = Location()
   >>> directlyProvides(root, IPublicationRoot)
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
+
+  >>> from cromlech.io.testing import TestRequest
   >>> request = TestRequest()
 
 Test the menu::
@@ -19,16 +26,10 @@ Test the menu::
 
   >>> navigation = NavigationMenu(context, request, current_view)
 
-  >>> from zope.security.testing import Principal, Participation
-  >>> from zope.security.management import newInteraction, endInteraction
-
-  >>> participation = Participation(Principal('zope.anybody'))
-  >>> newInteraction(participation)
-
   >>> navigation.update()
   >>> navigation.viewlets
-  [<menu.menuentry `a_direct_entry` for menu `navigationmenu`>,
-   <menu.menuentry `anotherview` for menu `navigationmenu`>]
+  [<menu.menuentry `a_direct_entry` for menu `NavigationMenu`>,
+   <menu.menuentry `anotherview` for menu `NavigationMenu`>]
 
   >>> print navigation.render()
   <dl id="navigationmenu" class="menu">
@@ -47,16 +48,10 @@ Test the menu::
     </dd>
   </dl>
 
-  >>> endInteraction()
 """
-from dolmen.menu.testing import grok
-from zope.location.location import Location
-from cromlech.io.interfaces import IPublicationRoot
 from cromlech.browser import IView
-from dolmen import viewlet
 from dolmen import menu
-from zope.interface import Interface, directlyProvides, implements
-from cromlech.io.testing import TestRequest
+from zope.interface import Interface, implements
 
 menu.context(Interface)
 
@@ -67,7 +62,7 @@ class NavigationMenu(menu.Menu):
 
 class GlobalView(object):
     implements(IView)
-    __name__ = 'globalview'
+    __component_name__ = 'globalview'
 
     def __init__(self, context, request):
         self.context = context
@@ -101,7 +96,6 @@ menu.global_menuentry(AnotherView, NavigationMenu, order=2,
 def test_suite():
     import unittest
     import doctest
-    from dolmen.menu import tests
 
     suite = unittest.TestSuite()
     mytest = doctest.DocTestSuite(
