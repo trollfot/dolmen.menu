@@ -14,6 +14,7 @@ from dolmen.template import TALTemplate
 
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 
+from zope.location import Location
 from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
@@ -110,7 +111,7 @@ class Menu(dolmen.viewlet.ViewletManager):
         self._updateViewlets()
 
 
-class Entry(dolmen.viewlet.Viewlet):
+class Entry(Location):
     """The menu entry viewlet
 
     template may be provided as an attribute or will be search as an

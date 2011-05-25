@@ -1,6 +1,13 @@
 Changes
 =======
 
+2.0a2 (2011-05-25)
+------------------
+
+* `Entry` is not longer a `dolmen.viewlet.Viewlet`. The component was
+  grokked twice, because of that.
+
+
 2.0a1 (2011-05-10)
 ------------------
 
