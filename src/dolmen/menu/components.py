@@ -68,16 +68,18 @@ class Menu(dolmen.viewlet.ViewletManager):
                 viewlet.update()
 
     def filter(self, viewlets):
-        """Iterator which filters out menu items based on user authorizations
+        """Iterator which filters out menu items based on
+        availability and user authorizations
         """
         for name, viewlet in viewlets:
-            permission = viewlet.permission
-            if permission == 'zope.Public':
-                # Translate public permission to CheckerPublic
-                permission = CheckerPublic
-            if checkPermission(permission, self.context) and \
-                    isAvailable(viewlet):
-                yield name, viewlet
+            if getattr(viewlet, 'available', True):
+                permission = viewlet.permission
+                if permission == 'zope.Public':
+                    # Translate public permission to CheckerPublic
+                    permission = CheckerPublic
+                if checkPermission(permission, self.context) and \
+                        isAvailable(viewlet):
+                    yield name, viewlet
 
     def render(self):
         """Template is taken from the template attribute or searching
@@ -121,6 +123,8 @@ class Entry(Location):
     implements(IMenuEntryViewlet)
     context(Interface)
     params = None
+
+    available = True
 
     def __init__(self, context, request, view, manager):
         self.view = self.__parent__ = view
