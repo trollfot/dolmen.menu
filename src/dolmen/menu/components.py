@@ -6,7 +6,7 @@ import grokcore.security
 from grokcore.component import title, description, context
 from grokcore.component import baseclass, adapter, implementer
 from grokcore.component.util import sort_components
-from cromlech.browser import ITemplate
+from cromlech.browser import ITemplate, negotiate
 
 import dolmen.viewlet
 from dolmen.location import absolute_url
@@ -88,7 +88,7 @@ class Menu(dolmen.viewlet.ViewletManager):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
-        return template.render(self)
+        return template.render(self, target_language=self.target_language)
 
     def get_menu_entries(self):
         # Find all content providers for the region
@@ -97,6 +97,10 @@ class Menu(dolmen.viewlet.ViewletManager):
             IMenuEntry)
         for item in self.filter(viewlets):
             yield item
+
+    @property
+    def target_language(self):
+        return negotiate(self.request)
 
     def update(self):
         self.__updated = True
@@ -145,6 +149,10 @@ class Entry(Location):
         namespace['entry'] = self
         namespace['menu'] = self.manager
         return namespace
+
+    @property
+    def target_language(self):
+        return negotiate(self.request)
 
     def update(self):
         pass
@@ -195,7 +203,7 @@ class Entry(Location):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
-        return template.render(self)
+        return template.render(self, target_language=self.target_language)
 
 
 _prefix = os.path.dirname(__file__)
