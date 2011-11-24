@@ -1,10 +1,17 @@
 Changes
 =======
 
+2.0b2 (2011-11-24)
+------------------
+
+* Fixed i18n using the new `cromlech.i18n` package.
+
+
 2.0b1 (2011-08-29)
 ------------------
 
 * Added an `available` property on menu
+
 
 2.0a2 (2011-05-25)
 ------------------

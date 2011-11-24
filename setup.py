@@ -4,13 +4,14 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '2.0b1'
+version = '2.0b2'
 readme = open("README.txt").read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
 install_requires = [
     'cromlech.browser',
     'cromlech.io',
+    'cromlech.i18n',
     'dolmen.location',
     'dolmen.template',
     'dolmen.viewlet',

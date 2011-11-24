@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import urllib
 import os
 
@@ -6,12 +7,12 @@ import grokcore.security
 from grokcore.component import title, description, context
 from grokcore.component import baseclass, adapter, implementer
 from grokcore.component.util import sort_components
-from cromlech.browser import ITemplate, negotiate
+from cromlech.browser import ITemplate
+from cromlech.i18n import ILanguage
 
 import dolmen.viewlet
 from dolmen.location import absolute_url
 from dolmen.template import TALTemplate
-
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 
 from zope.location import Location
@@ -100,7 +101,7 @@ class Menu(dolmen.viewlet.ViewletManager):
 
     @property
     def target_language(self):
-        return negotiate(self.request)
+        return ILanguage(self.request)
 
     def update(self):
         self.__updated = True
@@ -152,7 +153,7 @@ class Entry(Location):
 
     @property
     def target_language(self):
-        return negotiate(self.request)
+        return ILanguage(self.request)
 
     def update(self):
         pass
