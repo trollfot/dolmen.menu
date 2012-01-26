@@ -15,8 +15,8 @@ A root of publication to compute url::
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
 
-  >>> from cromlech.io.testing import TestRequest
-  >>> request = TestRequest()
+  >>> from cromlech.browser.testing import TestHTTPRequest
+  >>> request = TestHTTPRequest()
 
 Test the menu::
 

@@ -101,7 +101,7 @@ class Menu(dolmen.viewlet.ViewletManager):
 
     @property
     def target_language(self):
-        return ILanguage(self.request)
+        return ILanguage(self.request, None)
 
     def update(self):
         self.__updated = True
@@ -153,7 +153,7 @@ class Entry(Location):
 
     @property
     def target_language(self):
-        return ILanguage(self.request)
+        return ILanguage(self.request, None)
 
     def update(self):
         pass

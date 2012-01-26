@@ -1,6 +1,14 @@
 Changes
 =======
 
+2.0 2012-01-26
+------------------
+
+* Ilanguage adaptation is no more mandatory as in dolmen.view
+
+* use cromlech.browser.testing.TestHTTPRequest in tests
+
+
 2.0b2 (2011-11-24)
 ------------------
 

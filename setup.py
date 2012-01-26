@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '2.0b2'
+version = '2.0'
 readme = open("README.txt").read()
 history = open(join('docs', 'HISTORY.txt')).read()
 

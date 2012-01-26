@@ -8,7 +8,7 @@ def grok(module_name):
     config = ConfigurationMachine()
     zcml.do_grok('grokcore.component.meta', config)
     zcml.do_grok('dolmen.viewlet.meta', config)
-    zcml.do_grok('dolmen.location.resolvers', config)
+    zcml.do_grok('dolmen.location', config)
     zcml.do_grok('dolmen.menu.meta', config)
     zcml.do_grok('dolmen.menu.components', config)
     zcml.do_grok(module_name, config)
