@@ -9,15 +9,15 @@ A root of publication to compute url::
 
   >>> from zope.location.location import Location
   >>> from zope.interface import directlyProvides
-  >>> from cromlech.io.interfaces import IPublicationRoot
+  >>> from cromlech.browser import IPublicationRoot
 
   >>> root = Location()
   >>> directlyProvides(root, IPublicationRoot)
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
 
-  >>> from cromlech.browser.testing import TestHTTPRequest
-  >>> request = TestHTTPRequest()
+  >>> from cromlech.browser.testing import TestRequest
+  >>> request = TestRequest()
 
 A basic view ::
 

@@ -7,7 +7,7 @@ Groking ::
 A root of publication to compute url::
 
   >>> from zope.location.location import Location
-  >>> from cromlech.io.interfaces import IPublicationRoot
+  >>> from cromlech.browser import IPublicationRoot
   >>> from zope.interface import directlyProvides
   
   >>> root = Location()
@@ -15,8 +15,8 @@ A root of publication to compute url::
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
 
-  >>> from cromlech.browser.testing import TestHTTPRequest
-  >>> request = TestHTTPRequest()
+  >>> from cromlech.browser.testing import TestRequest
+  >>> request = TestRequest()
 
 Test the menu::
 

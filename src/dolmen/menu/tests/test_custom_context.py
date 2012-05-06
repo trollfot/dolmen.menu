@@ -14,10 +14,10 @@ A root of publication to compute url ::
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
 
-  >>> from cromlech.browser.testing import TestHTTPRequest
-  >>> request = TestHTTPRequest()
+  >>> from cromlech.browser.testing import TestRequest
+  >>> request = TestRequest()
 
-  >>> someview = GenericView(context, request)
+  >>> someview = GenericView()
   >>> rootmenu = RootMenu(context, request, someview)
 
   >>> rootmenu.update()
@@ -41,21 +41,11 @@ A root of publication to compute url ::
 from dolmen import menu
 from zope.interface import Interface
 from grokcore.security import require
-from cromlech.io.interfaces import IPublicationRoot
+from cromlech.browser import IPublicationRoot
 
 
 class GenericView(object):
     __component_name__ = 'generic_view'
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def update(self, *args, **kwargs):
-        pass
-
-    def render(self, *args, **kwargs):
-        return u"I'm a simple view"
 
 
 class RootMenu(menu.Menu):

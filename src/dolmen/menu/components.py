@@ -11,7 +11,7 @@ from cromlech.browser import ITemplate
 from cromlech.i18n import ILanguage
 
 import dolmen.viewlet
-from dolmen.location import absolute_url
+from dolmen.location import get_absolute_url
 from dolmen.template import TALTemplate
 from dolmen.menu.interfaces import IMenu, IMenuEntry, IMenuEntryViewlet
 
@@ -89,7 +89,8 @@ class Menu(dolmen.viewlet.ViewletManager):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
-        return template.render(self, target_language=self.target_language)
+        return template.render(
+            self, target_language=self.target_language, **self.namespace())
 
     def get_menu_entries(self):
         # Find all content providers for the region
@@ -111,7 +112,7 @@ class Menu(dolmen.viewlet.ViewletManager):
         menu_context = self.getMenuContext()
 
         # Get the MenuContext and calculate its url
-        self.context_url = absolute_url(menu_context, self.request)
+        self.context_url = get_absolute_url(menu_context, self.request)
 
         viewlets = self.get_menu_entries()
         self.viewlets = sort_components([entry for name, entry in viewlets])
@@ -180,7 +181,7 @@ class Entry(Location):
 
         You may override for a different strategy
         """
-        url = str("%s/%s" % (self.manager.context_url, self.__component_name__))
+        url = "%s/%s" % (self.manager.context_url, self.__component_name__)
         if self.params:
             url += '?' + urllib.urlencode(self.params, doseq=True)
         return url
@@ -204,7 +205,8 @@ class Entry(Location):
         template = getattr(self, 'template', None)
         if template is None:
             template = getMultiAdapter((self, self.request), ITemplate)
-        return template.render(self, target_language=self.target_language)
+        return template.render(
+            self, target_language=self.target_language, **self.namespace())
 
 
 _prefix = os.path.dirname(__file__)

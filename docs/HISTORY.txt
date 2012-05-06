@@ -1,8 +1,16 @@
 Changes
 =======
 
-2.0 2012-01-26
-------------------
+2.1 (2012-05-06)
+----------------
+
+* The last changes of `cromlech.browser` and the removal of `cromech.io`
+  are now ok. We also use the latest `grokcore.security`. Please check
+  the corresponding packages for more information.
+
+
+2.0 (2012-01-26)
+----------------
 
 * Ilanguage adaptation is no more mandatory as in dolmen.view
 

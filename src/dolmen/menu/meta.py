@@ -2,9 +2,8 @@
 
 import martian
 import dolmen.menu
-
-from cromlech.browser.directives import default_view_name
-from cromlech.io import IRequest
+from cromlech.browser import IRequest
+from dolmen.menu.declarations import get_default_name
 from zope import component, interface
 
 
@@ -49,7 +48,7 @@ class PreAdapterDecoratorGrokker(martian.GlobalGrokker):
     see :py:func:`declarations.function_menu_entry()`
     """
     martian.priority(1000)
-    
+
     def grok(self, name, module, module_info, config, **kw):
         callbacks = module_info.getAnnotation('dolmen.menufunctions', [])
         for register in callbacks:
@@ -77,7 +76,7 @@ class ViewletMenuEntriesGrokker(martian.ClassGrokker):
     martian.directive(dolmen.menu.context)
     martian.directive(dolmen.menu.view, default=interface.Interface)
     martian.directive(dolmen.menu.request, default=IRequest)
-    martian.directive(dolmen.menu.name, get_default=default_view_name)
+    martian.directive(dolmen.menu.name, get_default=get_default_name)
     martian.directive(dolmen.menu.menu, default=None)
 
     def execute(self, factory, config, context, menu, view, request,

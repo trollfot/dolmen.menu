@@ -5,24 +5,24 @@ import sys
 import types
 import zope.interface
 import zope.component
-
+import grokcore.security
 
 from martian.error import GrokImportError
 from martian.util import frame_is_module
-# TODO : do we want permission handling in a separate place not to enforce
-# use of grokcore.security ?
-import grokcore.security
+
+from cromlech.browser import IRequest
+from cromlech.browser.directives import view, request
+from dolmen.menu.interfaces import IMenu, IMenuEntry
 from grokcore.component import order, title, name, description, context
 
-from dolmen.menu.interfaces import IMenu, IMenuEntry
-from cromlech.io import IRequest
-from cromlech.io.directives import request
-from cromlech.browser.directives import view, default_view_name
+
+def get_default_name(factory, module=None, **data):
+    return factory.__name__.lower()
 
 
 EXTRACTABLES = {
-    'name': name.bind(get_default=default_view_name),
-    'title': title.bind(get_default=default_view_name),
+    'name': name.bind(get_default=get_default_name),
+    'title': title.bind(get_default=get_default_name),
     'description': description.bind(default=u""),
     'context': context.bind(default=zope.interface.Interface),
     'request': request.bind(default=IRequest),
@@ -50,7 +50,8 @@ def get_entry_values(factory, **extras):
 
 
 def function_menu_entry(frame, entry, menu, infos):
-    """return the registrator of a function as a menu entry"""
+    """return the registrer of a function as a menu entry.
+    """
     def register():
         values = get_entry_values(entry, **infos)
         context = values.get('context')
@@ -59,8 +60,8 @@ def function_menu_entry(frame, entry, menu, infos):
         # add declarations to make function an adapter to IMenuEntry
         adapter = zope.component.adapter(context, request, view, menu)
         implementer = zope.interface.implementer(IMenuEntry)
-        adapter(entry) # declare
-        implementer(entry) # declare
+        adapter(entry)  # declare
+        implementer(entry)  # declare
         adapters = frame.f_locals.get('__grok_adapters__', None)
         if adapters is None:
             frame.f_locals['__grok_adapters__'] = adapters = []
@@ -69,7 +70,8 @@ def function_menu_entry(frame, entry, menu, infos):
 
 
 def class_menu_entry(frame, entry, menu, infos):
-    """return the registrator of a class or a method as a menu entry"""
+    """return the registrator of a class or a method as a menu entry.
+    """
     def register(register_method, config):
         register_method(entry, menu, infos, config)
     return register

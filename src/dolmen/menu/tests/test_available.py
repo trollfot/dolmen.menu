@@ -7,7 +7,7 @@ Groking ::
 A root of publication to compute url::
 
   >>> from zope.location.location import Location
-  >>> from cromlech.io.interfaces import IPublicationRoot
+  >>> from cromlech.browser import IPublicationRoot
   >>> from zope.interface import directlyProvides
 
   >>> root = Location()
@@ -15,12 +15,12 @@ A root of publication to compute url::
   >>> context = Location()
   >>> context.__parent__, context.__name__ = root, 'test'
 
-  >>> from cromlech.browser.testing import TestHTTPRequest
-  >>> request = TestHTTPRequest()
+  >>> from cromlech.browser.testing import TestRequest
+  >>> request = TestRequest()
 
 Test the menu, not availbale, at first::
 
-  >>> current_view = GlobalView(context, request)
+  >>> current_view = GlobalView()
   >>> current_view
   <dolmen.menu.tests.test_available.GlobalView object at ...>
 
@@ -54,16 +54,6 @@ class NavigationMenu(menu.Menu):
 class GlobalView(object):
     implements(IView)
     __component_name__ = 'globalview'
-
-    def __init__(self, context, request):
-        self.context = context
-        self.request = request
-
-    def update(self, *args, **kwargs):
-        pass
-
-    def render(self, *args, **kwargs):
-        return u"I'm a view"
 
 
 class MayOrMayNotMenu(menu.Entry):

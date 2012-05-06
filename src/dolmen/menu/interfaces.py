@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from zope import schema # XXX Keep it ? (inpact setup.py if not)
+from zope import schema  # XXX Keep it ? (inpact setup.py if not)
 from zope.interface import Interface
 from zope.location import ILocation
 from dolmen.viewlet import IViewletManager, IViewlet
@@ -44,7 +44,7 @@ class IMenu(IViewletManager):
         default=None,
         required=False,
         title=u"Menu context object")
-    
+
     context_url = schema.URI(
         required=True,
         title=u"Absolute url of the menu context")
