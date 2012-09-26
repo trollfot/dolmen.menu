@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '2.1'
+version = '2.2'
 readme = open("README.txt").read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -16,7 +16,6 @@ install_requires = [
     'dolmen.template >= 0.2',
     'dolmen.viewlet >= 0.4',
     'grokcore.component',
-    'grokcore.security',
     'zope.dottedname',  # bug not declared by grokcore.security >= 1.6
     'martian',
     'setuptools',
@@ -24,12 +23,17 @@ install_requires = [
     'zope.interface',
     'zope.location',
     'zope.schema',
-    'zope.security',
     ]
 
 tests_require = [
     'cromlech.browser [test]',
     'zope.configuration',
+    ]
+
+tests_security = [
+    'dolmen.viewlet [security]',
+    'grokcore.security',
+    'zope.security',
     ]
 
 setup(name=name,
@@ -49,7 +53,7 @@ setup(name=name,
       zip_safe=False,
       tests_require=tests_require,
       install_requires=install_requires,
-      extras_require={'test': tests_require},
+      extras_require={'test': tests_require, 'security': tests_security},
       classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Other Audience',

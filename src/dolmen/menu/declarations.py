@@ -5,7 +5,6 @@ import sys
 import types
 import zope.interface
 import zope.component
-import grokcore.security
 
 from martian.error import GrokImportError
 from martian.util import frame_is_module
@@ -15,6 +14,16 @@ from cromlech.browser.directives import view, request
 from dolmen.menu.interfaces import IMenu, IMenuEntry
 from grokcore.component import order, title, name, description, context
 
+try:
+    import grokcore.security
+    SecurityGetter = lambda:grokcore.security.require.bind(default='zope.View')
+
+except ImportError:
+
+    class SecurityGetter(object):
+        def get(self, factory):
+            return None
+    
 
 def get_default_name(factory, module=None, **data):
     return factory.__name__.lower()
@@ -27,7 +36,7 @@ EXTRACTABLES = {
     'context': context.bind(default=zope.interface.Interface),
     'request': request.bind(default=IRequest),
     'view': view.bind(default=zope.interface.Interface),
-    'permission': grokcore.security.require.bind(default='zope.View'),
+    'permission': SecurityGetter(),
     'order': order.bind(),
     }
 
@@ -109,7 +118,7 @@ class global_menuentry(martian.MultipleTimesDirective):
         return (component, menu, args)
 
 
-class menuentry:
+class menuentry(object):
     """
     Decorator meant to be use on a function to declare it as a menu entry
 

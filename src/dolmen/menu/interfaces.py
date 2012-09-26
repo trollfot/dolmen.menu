@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from zope import schema  # XXX Keep it ? (inpact setup.py if not)
-from zope.interface import Interface
+from zope.interface import Interface, Attribute
 from zope.location import ILocation
 from dolmen.viewlet import IViewletManager, IViewlet
-from zope.security.zcml import Permission
 
 
 class IMenuEntry(Interface):
@@ -14,10 +13,8 @@ class IMenuEntry(Interface):
         title=u"Identifier",
         required=True)
 
-    permission = Permission(
-        title=u"Permission",
-        description=u"Permission required to use this component.",
-        required=True)
+    permission = Attribute(
+        u"Permission required to use this component.")
 
     title = schema.TextLine(
         required=True,

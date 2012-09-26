@@ -3,12 +3,12 @@
 import urllib
 import os
 
-import grokcore.security
 from grokcore.component import title, description, context
 from grokcore.component import baseclass, adapter, implementer
 from grokcore.component.util import sort_components
 from cromlech.browser import ITemplate
 from cromlech.i18n import ILanguage
+from cromlech.browser import IRequest
 
 import dolmen.viewlet
 from dolmen.location import get_absolute_url
@@ -19,15 +19,50 @@ from zope.location import Location
 from zope.component import getAdapters, getMultiAdapter
 from zope.interface import implements, Interface
 from zope.schema.fieldproperty import FieldProperty
-from zope.security import checkPermission
-from zope.security.checker import CheckerPublic
+
+try:
+    import zope.security
+
+    def check_security(permission, component):
+        if permission == 'zope.Public':
+            # Translate public permission to CheckerPublic
+            permission = zope.security.checker.CheckerPublic
+        return zope.security.checkPermission(permission, component)
+
+    CHECKER = check_security
+except ImportError:
+    CHECKER = None
 
 
-def isAvailable(viewlet):
-    try:
-        return viewlet.available
-    except AttributeError:
-        return True
+def query_entries(context, request, view, menu, interface=IMenuEntry):
+    """Query entries of the given menu :
+
+    * Queries the registry according to context, request, view, menu.
+    * Updates the components.
+    * Filters out the unavailable components.
+    * Returns an iterable of components.
+    """
+    def isAvailable(component):
+        return bool(getattr(component, 'available', True))
+
+    def registry_components():
+        for name, entry in getAdapters(
+            (context, request, view, menu), interface):
+
+            success = True
+            if CHECKER is not None:
+                permission = entry.permission
+                if permission is not None:
+                    success = CHECKER(permission, entry)
+
+            if success and isAvailable(entry):
+                if IMenuEntryViewlet.providedBy(entry):
+                    entry.update()
+                yield entry
+
+    assert interface.isOrExtends(IMenuEntry)
+    assert IRequest.providedBy(request), "request must be an IRequest"
+    return registry_components()
 
 
 class Menu(dolmen.viewlet.ViewletManager):
@@ -40,7 +75,6 @@ class Menu(dolmen.viewlet.ViewletManager):
     implements(IMenu)
     viewlets = []
 
-    entries = FieldProperty(IMenu['entries'])
     menu_class = FieldProperty(IMenu['menu_class'])
     entry_class = FieldProperty(IMenu['entry_class'])
     context_url = FieldProperty(IMenu['context_url'])
@@ -55,50 +89,15 @@ class Menu(dolmen.viewlet.ViewletManager):
             return self.__class__.__name__.lower()
         return component_name
 
+    @property
+    def entries(self):
+        return self.viewlets
+
     def setMenuContext(self, item):
         self.menu_context = item
 
     def getMenuContext(self):
         return self.menu_context or self.context
-
-    def _updateViewlets(self):
-        """Doesn't fire events, like the original ViewletManager, on purpose.
-        """
-        for viewlet in self.viewlets:
-            if IMenuEntryViewlet.providedBy(viewlet):
-                viewlet.update()
-
-    def filter(self, viewlets):
-        """Iterator which filters out menu items based on
-        availability and user authorizations
-        """
-        for name, viewlet in viewlets:
-            if getattr(viewlet, 'available', True):
-                permission = viewlet.permission
-                if permission == 'zope.Public':
-                    # Translate public permission to CheckerPublic
-                    permission = CheckerPublic
-                if checkPermission(permission, self.context) and \
-                        isAvailable(viewlet):
-                    yield name, viewlet
-
-    def render(self):
-        """Template is taken from the template attribute or searching
-        for an adapter to ITemplate for menu and request
-        """
-        template = getattr(self, 'template', None)
-        if template is None:
-            template = getMultiAdapter((self, self.request), ITemplate)
-        return template.render(
-            self, target_language=self.target_language, **self.namespace())
-
-    def get_menu_entries(self):
-        # Find all content providers for the region
-        viewlets = getAdapters(
-            (self.getMenuContext(), self.request, self.view, self),
-            IMenuEntry)
-        for item in self.filter(viewlets):
-            yield item
 
     @property
     def target_language(self):
@@ -114,9 +113,19 @@ class Menu(dolmen.viewlet.ViewletManager):
         # Get the MenuContext and calculate its url
         self.context_url = get_absolute_url(menu_context, self.request)
 
-        viewlets = self.get_menu_entries()
-        self.viewlets = sort_components([entry for name, entry in viewlets])
-        self._updateViewlets()
+        # Get the viewlets, sort them and update them
+        self.viewlets = sort_components(list(query_entries(
+            menu_context, self.request, self.view, self)))
+
+    def render(self):
+        """Template is taken from the template attribute or searching
+        for an adapter to ITemplate for menu and request
+        """
+        template = getattr(self, 'template', None)
+        if template is None:
+            template = getMultiAdapter((self, self.request), ITemplate)
+        return template.render(
+            self, target_language=self.target_language, **self.namespace())
 
 
 class Entry(Location):
@@ -128,8 +137,8 @@ class Entry(Location):
     baseclass()
     implements(IMenuEntryViewlet)
     context(Interface)
-    params = None
 
+    params = None
     available = True
 
     def __init__(self, context, request, view, manager):
@@ -192,7 +201,11 @@ class Entry(Location):
 
     @property
     def permission(self):
-        return grokcore.security.require.bind().get(self)
+        try:
+            import grokcore.security
+            return grokcore.security.require.bind().get(self)
+        except ImportError:
+            return None
 
     @property
     def description(self):

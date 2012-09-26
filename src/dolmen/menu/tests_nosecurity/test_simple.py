@@ -23,20 +23,19 @@ A basic view ::
 
   >>> someview = SomeView(context, request)
   >>> someview
-  <dolmen.menu.tests.test_multidecorators.SomeView object at ...>
+  <dolmen.menu.tests_nosecurity.test_simple.SomeView object at ...>
 
-testing menu ::
+Using the menu ::
 
   >>> mymenu = MyMenu(context, request, someview)
-  >>> anothermenu = AnotherMenu(context, request, someview)
+
+Use it ::
+
 
   >>> mymenu.update()
   >>> mymenu.viewlets
-  [<menu.menuentry `entrywithdetails` for menu `MyMenu`>]
-
-  >>> anothermenu.update()
-  >>> anothermenu.viewlets
-  [<menu.menuentry `entrywithdetails` for menu `AnotherMenu`>]
+  [<menu.menuentry `entrywithdetails` for menu `MyMenu`>,
+   <FactoryGeneratedEntry `an_entry` for menu `MyMenu`>]
 
   >>> print mymenu.render()
   <dl id="mymenu" class="menu">
@@ -44,21 +43,10 @@ testing menu ::
     <dd>
       <ul>
         <li class="entry">
-          <a alt="" href="http://localhost/test/entrywithdetails"
-             title="An entry with some details">An entry with some details</a>
+    	  <a alt="This is a nice view." href="http://localhost/test/entrywithdetails" title="Nice view">Nice view</a>
         </li>
-      </ul>
-    </dd>
-  </dl>
-
-  >>> print anothermenu.render()
-  <dl id="anothermenu" class="menu">
-    <dt>My other menu</dt>
-    <dd>
-      <ul>
         <li class="entry">
-          <a alt="" href="http://localhost/test/entrywithdetails"
-             title="Alternate title">Alternate title</a>
+    	  <a href="http://dolmen-project.org" title="Dolmen link">Dolmen link</a>
         </li>
       </ul>
     </dd>
@@ -66,38 +54,66 @@ testing menu ::
 
 """
 
+from zope.interface import implements
+from cromlech.browser import IView
 from dolmen import menu
 from zope.interface import Interface
 
-menu.context(Interface)  # everywhere !
+
+menu.context(Interface)
+
+Public = 'zope.Public'
 
 
 class MyMenu(menu.Menu):
     menu.title('My nice menu')
 
 
-class AnotherMenu(menu.Menu):
-    menu.title('My other menu')
-
-
 class SomeView(object):
+    implements(IView)
     __component_name__ = 'someview'
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
-    def render(self):
+    def update(self, *args, **kwargs):
+        pass
+
+    def render(self, *args, **kwargs):
         return u"I'm a simple view"
 
 
-@menu.menuentry(MyMenu, permission='zope.Public')
-@menu.menuentry(AnotherMenu, title="Alternate title", permission='zope.Public')
+@menu.menuentry(MyMenu, title='Nice view', description='This is a nice view.')
 class EntryWithDetails(SomeView):
-    menu.title("An entry with some details")
-
     def render(self):
         return u"A simple entry"
+
+
+class MyEntry(object):
+    """A very basic entry.
+    """
+    def __init__(self, menu, id, title, url, desc=u""):
+        self.__name__ = id
+        self.permission = None
+        self.title = title
+        self.description = desc
+        self.url = url
+        self.menu = menu
+
+    def __repr__(self):
+        return "<FactoryGeneratedEntry `%s` for menu `%s`>" % (
+            self.__name__, self.menu.__class__.__name__)
+
+    def render(self):
+        return """<a href="%s" title="%s">%s</a>""" % (
+            self.url, self.title, self.title)
+
+
+@menu.menuentry(MyMenu)
+def manual_entry(context, request, view, menu):
+    return MyEntry(menu, 'an_entry', 'Dolmen link',
+                   url="http://dolmen-project.org")
 
 
 def test_suite():
