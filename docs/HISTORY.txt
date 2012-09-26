@@ -1,6 +1,13 @@
 Changes
 =======
 
+2.2 (2012-05-06)
+----------------
+
+* First attempt to make `dolmen.menu` independant from security declarations.
+  `zope.security` and `grokcore.security` are now optional.
+
+
 2.1 (2012-05-06)
 ----------------
 
