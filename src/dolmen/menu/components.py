@@ -24,6 +24,8 @@ try:
     import zope.security
 
     def check_security(permission, component):
+        if zope.security.management.getSecurityPolicy() is None:
+            return True
         if permission == 'zope.Public':
             # Translate public permission to CheckerPublic
             permission = zope.security.checker.CheckerPublic
