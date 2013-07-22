@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from os.path import join
 
 name = 'dolmen.menu'
-version = '2.2'
+version = '2.3'
 readme = open("README.txt").read()
 history = open(join('docs', 'HISTORY.txt')).read()
 
@@ -13,8 +13,8 @@ install_requires = [
     'cromlech.browser >= 0.5',
     'cromlech.i18n',
     'dolmen.location >= 0.2',
-    'dolmen.template >= 0.2',
-    'dolmen.viewlet >= 0.4',
+    'dolmen.template >= 0.3.1',
+    'dolmen.viewlet >= 0.4.1',
     'grokcore.component',
     'zope.dottedname',  # bug not declared by grokcore.security >= 1.6
     'martian',

@@ -49,17 +49,16 @@ Use it ::
     <dd>
       <ul>
         <li class="entry">
-          <a alt="This is a nice view."
-             href="http://localhost/test/entrywithdetails"
-             title="Nice view">Nice view</a>
+          <a href="http://localhost/test/entrywithdetails"
+             title="Nice view" alt="This is a nice view.">Nice view</a>
         </li>
         <li class="entry">
-          <a alt="" href="http://localhost/test/testentry"
-             title="testentry">testentry</a>
+          <a href="http://localhost/test/testentry"
+             title="testentry" alt="">testentry</a>
         </li>
         <li class="entry">
-          <a alt="" href="http://localhost/test/testentrywithparams?type=1"
-             title="testentrywithparams">testentrywithparams</a>
+          <a href="http://localhost/test/testentrywithparams?type=1"
+             title="testentrywithparams" alt="">testentrywithparams</a>
         </li>
         <li class="entry">
           <a href="http://dolmen-project.org"

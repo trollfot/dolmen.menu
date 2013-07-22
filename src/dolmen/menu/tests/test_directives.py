@@ -9,7 +9,7 @@ A root of publication to compute url::
   >>> from zope.location.location import Location
   >>> from cromlech.browser import IPublicationRoot
   >>> from zope.interface import directlyProvides
-  
+
   >>> root = Location()
   >>> directlyProvides(root, IPublicationRoot)
   >>> context = Location()
@@ -28,8 +28,7 @@ Test the menu::
 
   >>> navigation.update()
   >>> navigation.viewlets
-  [<menu.menuentry `a_direct_entry` for menu `NavigationMenu`>,
-   <menu.menuentry `anotherview` for menu `NavigationMenu`>]
+  [<menu.menuentry `a_direct_entry` for menu `NavigationMenu`>, <menu.menuentry `anotherview` for menu `NavigationMenu`>, <menu.menuentry `a_second_entry` for menu `NavigationMenu`>]
 
   >>> print navigation.render()
   <dl id="navigationmenu" class="menu">
@@ -41,8 +40,12 @@ Test the menu::
                title="My Entry">My Entry</a>
           </li>
           <li class="entry">
-            <a alt="" href="http://localhost/test/anotherview"
-               title="anotherview">anotherview</a>
+            <a href="http://localhost/test/anotherview"
+               title="anotherview" alt="">anotherview</a>
+         </li>
+         <li class="entry">
+            <a href="http://localhost/test/a_second_entry?type=1"
+               title="My other Entry">My other Entry</a>
          </li>
       </ul>
     </dd>
@@ -51,17 +54,24 @@ Test the menu::
 """
 from cromlech.browser import IView
 from dolmen import menu
-from zope.interface import Interface, implements
+from dolmen.menu.interfaces import IMenu
+from zope.interface import Interface, implementer
+
 
 menu.context(Interface)
 
 
+class ISomeMenu(IMenu):
+    pass
+
+
+@implementer(ISomeMenu)
 class NavigationMenu(menu.Menu):
     menu.title('My nice menu')
 
 
+@implementer(IView)
 class GlobalView(object):
-    implements(IView)
     __component_name__ = 'globalview'
 
     def __init__(self, context, request):
@@ -88,6 +98,17 @@ class MyMenuEntry(menu.Entry):
     menu.title('My Entry')
     menu.menu(NavigationMenu)
     params = {'type': 1}
+
+
+class AnotherEntry(menu.Entry):
+    """all set up by directives
+    """
+    menu.order(2)
+    menu.name('a_second_entry')
+    menu.title('My other Entry')
+    menu.menu(ISomeMenu)
+    params = {'type': 1}
+
 
 menu.global_menuentry(AnotherView, NavigationMenu, order=2,
                       permission='zope.Public')

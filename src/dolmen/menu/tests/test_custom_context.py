@@ -30,8 +30,8 @@ A root of publication to compute url ::
     <dd>
       <ul>
         <li class="entry">
-          <a alt="" href="http://localhost/somerootentry"
-                    title="somerootentry">somerootentry</a>
+          <a href="http://localhost/somerootentry"
+             title="somerootentry" alt="">somerootentry</a>
         </li>
       </ul>
     </dd>

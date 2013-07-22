@@ -44,8 +44,8 @@ testing menu ::
     <dd>
       <ul>
         <li class="entry">
-          <a alt="" href="http://localhost/test/entrywithdetails"
-             title="An entry with some details">An entry with some details</a>
+          <a href="http://localhost/test/entrywithdetails"
+             title="An entry with some details" alt="">An entry with some details</a>
         </li>
       </ul>
     </dd>
@@ -57,8 +57,8 @@ testing menu ::
     <dd>
       <ul>
         <li class="entry">
-          <a alt="" href="http://localhost/test/entrywithdetails"
-             title="Alternate title">Alternate title</a>
+          <a href="http://localhost/test/entrywithdetails"
+             title="Alternate title" alt="">Alternate title</a>
         </li>
       </ul>
     </dd>

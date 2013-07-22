@@ -23,7 +23,7 @@ except ImportError:
     class SecurityGetter(object):
         def get(self, factory):
             return None
-    
+
 
 def get_default_name(factory, module=None, **data):
     return factory.__name__.lower()
@@ -87,7 +87,12 @@ def class_menu_entry(frame, entry, menu, infos):
 
 
 def validateMenu(directive, value):
-    if not IMenu.implementedBy(value):
+    if zope.interface.interfaces.IInterface.providedBy(value):
+        if not value.isOrExtends(IMenu):
+            raise ValueError(
+                "You can only register a menu item on a IMenu component.")
+
+    elif not IMenu.implementedBy(value):
         raise ValueError(
             "You can only register a menu item on a IMenu component.")
 
